@@ -61,7 +61,7 @@ first_start							/* 从开机后进入的第一个任务 */
 		BX LR  /* 执行异常返回, 执行这句后，由硬件来执行弹出那8个寄存器的操作 */
 }
 
-void first_tast_entry()
+void first_tast_entry(void)
 {
 	/* 设置PSP栈为0，方便判断是不是复位后才开始 */
 	__set_PSP(0);
@@ -71,12 +71,34 @@ void first_tast_entry()
 	MEM32(NVIC_INT_CTRL) = NVIC_PENDSVSET;    /* 软件置位PENDSV的中断进行任务切换 */
 }
 
-void task_witch ()
+void task_witch (void)
 {
 	MEM32(NVIC_INT_CTRL) = NVIC_PENDSVSET;    /* 软件置位PENDSV的中断进行任务切换 */
 }
 
-//void task_sched()
-//{
-//	task_witch ();
-//}
+extern rtos_task_t	 task1;
+extern rtos_task_t	 task2;
+extern rtos_task_t	 task_idle;
+
+extern rtos_task_t *next_task;
+
+
+void task_schedule(void)
+{
+	if ((task1.task_delay != 0) && (task2.task_delay != 0)) {
+		
+		next_task = &task_idle;
+		
+	} else if (task1.task_delay != 0) {
+		
+		next_task = &task2;
+		
+	} else if (task2.task_delay != 0) {
+	
+		next_task = &task1;
+	} else {
+		next_task = &task1;
+	}
+	
+	task_witch ();
+}

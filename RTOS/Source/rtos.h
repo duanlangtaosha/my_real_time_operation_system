@@ -11,18 +11,21 @@
 #define MEM32(addr)         *(volatile unsigned long *)(addr)
 #define MEM8(addr)          *(volatile unsigned char *)(addr)
 	
+
+
 typedef struct __rtos_task {
 
 	uint32_t *p_stack;
+	uint32_t  task_delay;
 	
 }rtos_task_t;
 
 typedef uint32_t task_stack;
 
 
-void first_tast_entry();
+void first_tast_entry(void);
 
-void task_witch ();
+void task_witch (void);
 
-//void task_sched();
+void task_schedule(void);
 #endif
