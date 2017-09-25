@@ -61,6 +61,19 @@ first_start							/* 从开机后进入的第一个任务 */
 		BX LR  /* 执行异常返回, 执行这句后，由硬件来执行弹出那8个寄存器的操作 */
 }
 
+
+__asm void task_enter_critical(void)
+{
+	CPSID I
+	BX LR
+}
+
+__asm void task_exit_critical(void)
+{
+	CPSIE I
+	BX LR
+}
+
 void first_tast_entry(void)
 {
 	/* 设置PSP栈为0，方便判断是不是复位后才开始 */

@@ -74,10 +74,21 @@ void task1_func()
 	}
 }
 
+uint32_t test_public_varaible = 0;
 void task2_func()
 {
 
 	for (; ;) {
+		uint32_t i = 0xFFFF;
+		uint32_t count = 0;
+		
+		task_enter_critical();
+		
+		count = test_public_varaible;
+		while(i--);
+		
+		test_public_varaible = count + 1;
+		task_exit_critical();
 		flag2 = 1;
 		delay(2);
 		flag2 = 0;
@@ -125,6 +136,7 @@ void task_sched()
 
 void SysTick_Handler () 
 {
+	test_public_varaible++;
 
 		if (task1.task_delay != 0) {
 			task1.task_delay--;

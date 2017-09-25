@@ -28,4 +28,8 @@ void first_tast_entry(void);
 void task_witch (void);
 
 void task_schedule(void);
+
+void task_enter_critical(void);
+
+void task_exit_critical(void);
 #endif
