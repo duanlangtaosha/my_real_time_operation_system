@@ -1,5 +1,8 @@
 #include "ARMCM3.h"
 #include "rtos.h"
+#include "lib.h"
+
+#define TASK_COUNT  255
 
 rtos_task_t	 task1;
 rtos_task_t	 task2;
@@ -7,7 +10,9 @@ rtos_task_t	 task_idle;
 
 rtos_task_t *current_task;
 rtos_task_t *next_task;
+rtos_task_t *task_list[TASK_COUNT];
 
+bitmap g_bit_map;
 
 task_stack  task1_stack[1024];
 task_stack  task2_stack[1024];
@@ -50,7 +55,7 @@ void tSetSysTickPeriod(uint32_t ms)
                    SysTick_CTRL_ENABLE_Msk; 
 }
 
-void task_init(rtos_task_t *p_task, task_stack * p_task_stack, void* func_entry, void *p_param)
+void task_init(rtos_task_t *p_task, task_stack * p_task_stack, uint8_t prio, void* func_entry, void *p_param)
 {
 	*(--p_task_stack) = (uint32_t)(1 << 24);
 	*(--p_task_stack) = (uint32_t)func_entry;
@@ -71,6 +76,8 @@ void task_init(rtos_task_t *p_task, task_stack * p_task_stack, void* func_entry,
 	
 	p_task->p_stack = p_task_stack;
 	p_task->task_delay = 0;
+	task_list[prio] = p_task;
+	bitmap_set(&g_bit_map, prio);
 }
 
 int flag1  = 0;
@@ -122,17 +129,39 @@ void task_idle_func()
 	}
 }
 
+rtos_task_t* task_high_redy()
+{
+	uint32_t temp = get_bitmap_high_prio(&g_bit_map);
+	
+	return task_list[temp];
+}
+
+int test = 0;
 int main(){
+	bitmap_init(&g_bit_map);
 	
-	task_init(&task1, &task1_stack[1024], task1_func, (void*)0x11111111);
+//	bitmap_set(&g_bit_map, 1);
+//	bitmap_set(&g_bit_map, 2);
+//	
+//	test = get_bitmap_high_prio(&g_bit_map);
+//	
+//		bitmap_clr(&g_bit_map, 1);
+//	
+//	test = get_bitmap_high_prio(&g_bit_map);
 	
-	task_init(&task2, &task2_stack[1024], task2_func, (void*)0x22222222);
+	task_init(&task1, &task1_stack[1024], 1, task1_func, (void*)0x11111111);
 	
-	task_init(&task_idle, &task_idle_stack[1024], task_idle_func, (void*)0x22222222);
+	task_init(&task2, &task2_stack[1024], 2, task2_func, (void*)0x22222222);
 	
-	next_task = &task1;
+	task_init(&task_idle, &task_idle_stack[1024], 255, task_idle_func, (void*)0x22222222);
+	
+//	next_task = &task1;
+	next_task = task_high_redy();
 
 	first_tast_entry();
+	
+	
+	
 	
 /* 不可能执行到返回 */
 	return 0;

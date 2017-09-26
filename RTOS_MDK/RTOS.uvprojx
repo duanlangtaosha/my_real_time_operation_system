@@ -388,6 +388,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\rtos_switch.c</FilePath>
             </File>
+            <File>
+              <FileName>bit_map.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\bit_map.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
