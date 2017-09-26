@@ -95,9 +95,18 @@ extern rtos_task_t	 task_idle;
 
 extern rtos_task_t *next_task;
 
+extern uint32_t task_schedule_lock;
 
 void task_schedule(void)
 {
+	task_enter_critical();
+	
+		if (task_schedule_lock > 0) {
+		task_exit_critical();
+		
+		return;
+	}
+	
 	if ((task1.task_delay != 0) && (task2.task_delay != 0)) {
 		
 		next_task = &task_idle;
@@ -114,4 +123,5 @@ void task_schedule(void)
 	}
 	
 	task_witch ();
+	task_exit_critical();
 }

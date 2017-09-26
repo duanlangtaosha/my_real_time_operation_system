@@ -12,14 +12,29 @@ rtos_task_t *next_task;
 task_stack  task1_stack[1024];
 task_stack  task2_stack[1024];
 task_stack  task_idle_stack[1024];
-//void delay(uint32_t time)
-//{
-//	while(time--);
-//}
+
+uint8_t  task_schedule_lock = 0;
+
+
+void task_schedule_disable ()
+{
+	if (task_schedule_lock < 255) {
+		task_schedule_lock ++;
+	} 
+}
+
+void task_schedule_enable ()
+{
+	if (task_schedule_lock > 0) {
+		task_schedule_lock--;
+	}
+}
 
 void delay(uint32_t systick)
 {
+	task_enter_critical();
 	current_task->task_delay = systick;
+	task_exit_critical();
 	
 	task_schedule();
 }
@@ -70,7 +85,7 @@ void task1_func()
 		delay(2);
 		flag1 = 0;
 		delay(2);
-//		next_task = &task2;
+
 	}
 }
 
@@ -82,18 +97,18 @@ void task2_func()
 		uint32_t i = 0xFFFF;
 		uint32_t count = 0;
 		
-		task_enter_critical();
-		
+
+		task_schedule_disable();
 		count = test_public_varaible;
 		while(i--);
 		
 		test_public_varaible = count + 1;
-		task_exit_critical();
+		task_schedule_enable();
+
 		flag2 = 1;
 		delay(2);
 		flag2 = 0;
 		delay(2);
-//		next_task = &task1;
 
 	}
 	
@@ -123,15 +138,26 @@ int main(){
 	return 0;
 }
 
-void task_sched()
-{
-	if (current_task == &task1) {
-		next_task = &task2;
-	} else {
-		next_task = &task1;
-	}
-	task_witch ();
-}
+//void task_sched()
+//{
+//	
+//	/* 只要访问共享变量的都要加临界区保护，防止数据被覆盖 */
+//	task_enter_critical();
+//	
+//	if (task_schedule_lock > 0) {
+//		task_exit_critical();
+//		
+//		return;
+//	}
+//	
+//	if (current_task == &task1) {
+//		next_task = &task2;
+//	} else {
+//		next_task = &task1;
+//	}
+//	task_witch ();
+//	task_exit_critical();
+//}
 
 
 void SysTick_Handler () 
