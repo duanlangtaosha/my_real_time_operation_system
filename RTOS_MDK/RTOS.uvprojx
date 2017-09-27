@@ -393,6 +393,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\bit_map.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_list.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

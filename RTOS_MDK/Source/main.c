@@ -1,6 +1,9 @@
 #include "ARMCM3.h"
 #include "rtos.h"
 #include "lib.h"
+#include "ls_list.h"
+
+
 
 #define TASK_COUNT  255
 
@@ -74,6 +77,7 @@ void task_init(rtos_task_t *p_task, task_stack * p_task_stack, uint8_t prio, voi
 	*(--p_task_stack) = (uint32_t)5;    /* R5 */
 	*(--p_task_stack) = (uint32_t)4;    /* R4 */
 	
+	p_task->task_pro = prio;
 	p_task->p_stack = p_task_stack;
 	p_task->task_delay = 0;
 	task_list[prio] = p_task;
@@ -123,7 +127,6 @@ void task2_func()
 int flag3 = 0;
 void task_idle_func()
 {
-	uint32_t a = 0;
 	for (; ;) {
 	flag3 = !flag3;
 	}
@@ -140,22 +143,12 @@ int test = 0;
 int main(){
 	bitmap_init(&g_bit_map);
 	
-//	bitmap_set(&g_bit_map, 1);
-//	bitmap_set(&g_bit_map, 2);
-//	
-//	test = get_bitmap_high_prio(&g_bit_map);
-//	
-//		bitmap_clr(&g_bit_map, 1);
-//	
-//	test = get_bitmap_high_prio(&g_bit_map);
-	
 	task_init(&task1, &task1_stack[1024], 1, task1_func, (void*)0x11111111);
 	
 	task_init(&task2, &task2_stack[1024], 2, task2_func, (void*)0x22222222);
 	
 	task_init(&task_idle, &task_idle_stack[1024], 255, task_idle_func, (void*)0x22222222);
 	
-//	next_task = &task1;
 	next_task = task_high_redy();
 
 	first_tast_entry();

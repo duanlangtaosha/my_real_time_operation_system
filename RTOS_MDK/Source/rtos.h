@@ -2,6 +2,7 @@
 #define __MY_ROTS_H
 
 #include "stdint.h"
+#include "ls_list.h"
 
 #define NVIC_INT_CTRL       0xE000ED04      /**< \brief 中断控制及状态寄存器 */
 #define NVIC_PENDSVSET      0x10000000      /**< \brief 触发软件中断的值 */
@@ -16,7 +17,13 @@
 typedef struct __rtos_task {
 
 	uint32_t *p_stack;
+	
 	uint32_t  task_delay;
+	ls_node_t delay_node;
+	
+	uint32_t task_pro;
+	
+	uint32_t task_state;
 	
 }rtos_task_t;
 
