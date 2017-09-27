@@ -13,7 +13,7 @@ typedef struct _rtos_task {
 
 typedef uint32_t rtos_stack;
 
-rtos_task_t task1;
+rtos_task_t task1 = {0};
 rtos_task_t task2;
 
 rtos_stack task1_stack[1024];
