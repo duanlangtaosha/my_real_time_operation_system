@@ -14,29 +14,16 @@
 	
 
 
-typedef struct __rtos_task {
-
-	uint32_t *p_stack;
-	
-	uint32_t  task_delay;
-	ls_node_t delay_node;
-	
-	uint32_t task_pro;
-	
-	uint32_t task_state;
-	
-}rtos_task_t;
-
-typedef uint32_t task_stack;
 
 
-void first_tast_entry(void);
 
-void task_witch (void);
+void ls_first_tast_entry(void);
 
-void task_schedule(void);
+void ls_task_witch (void);
 
-void task_enter_critical(void);
+void ls_task_schedule(void);
 
-void task_exit_critical(void);
+void ls_task_enter_critical(void);
+
+void ls_task_exit_critical(void);
 #endif

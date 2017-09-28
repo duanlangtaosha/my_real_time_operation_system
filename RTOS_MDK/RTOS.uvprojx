@@ -398,6 +398,21 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_list.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ls_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\app.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -3,29 +3,29 @@
 #include "lib.h"
 
 
+ls_bitmap g_bit_map;
 
-
-void bitmap_init (void *p_bitmap)
+void ls_bitmap_init (void *p_bitmap)
 {
-	((bitmap *)p_bitmap)->bit_map = 0;
+	((ls_bitmap *)p_bitmap)->bit_map = 0;
 }
 
-void bitmap_set (void *p_bitmap, uint32_t pos)
+void ls_bitmap_set (void *p_bitmap, uint32_t pos)
 {
-	((bitmap *)p_bitmap)->bit_map |= (1 << pos);
+	((ls_bitmap *)p_bitmap)->bit_map |= (1 << pos);
 }
 
-void bitmap_clr (void *p_bitmap, uint32_t pos)
+void ls_bitmap_clr (void *p_bitmap, uint32_t pos)
 {
-	((bitmap *)p_bitmap)->bit_map &= ~(1 << pos);
+	((ls_bitmap *)p_bitmap)->bit_map &= ~(1 << pos);
 }
 
-uint32_t bitmappos_counnt ()
+uint32_t ls_bitmap_counnt ()
 {
 	return 32;
 }
 
-uint32_t get_bitmap_high_prio(void *p_bitmap)
+uint32_t ls_get_bitmap_high_prio(void *p_bitmap)
 {
 		static const uint8_t quickFindTable[] =     
 	{
@@ -47,25 +47,25 @@ uint32_t get_bitmap_high_prio(void *p_bitmap)
 	    /* F0 */ 4,    0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
 	};
 
-	if (((bitmap *)p_bitmap)->bit_map & 0xff)
+	if (((ls_bitmap *)p_bitmap)->bit_map & 0xff)
     {
-        return quickFindTable[((bitmap *)p_bitmap)->bit_map & 0xff];         
+        return quickFindTable[((ls_bitmap *)p_bitmap)->bit_map & 0xff];         
     }
-    else if (((bitmap *)p_bitmap)->bit_map & 0xff00)
+    else if (((ls_bitmap *)p_bitmap)->bit_map & 0xff00)
     {
-        return quickFindTable[(((bitmap *)p_bitmap)->bit_map >> 8) & 0xff] + 8;        
+        return quickFindTable[(((ls_bitmap *)p_bitmap)->bit_map >> 8) & 0xff] + 8;        
     }
-    else if (((bitmap *)p_bitmap)->bit_map & 0xff0000)
+    else if (((ls_bitmap *)p_bitmap)->bit_map & 0xff0000)
     {
-        return quickFindTable[(((bitmap *)p_bitmap)->bit_map >> 16) & 0xff] + 16;        
+        return quickFindTable[(((ls_bitmap *)p_bitmap)->bit_map >> 16) & 0xff] + 16;        
     }
-    else if (((bitmap *)p_bitmap)->bit_map & 0xFF000000)
+    else if (((ls_bitmap *)p_bitmap)->bit_map & 0xFF000000)
     {
-        return quickFindTable[(((bitmap *)p_bitmap)->bit_map >> 24) & 0xFF] + 24;
+        return quickFindTable[(((ls_bitmap *)p_bitmap)->bit_map >> 24) & 0xFF] + 24;
     }
     else
     {
-        return bitmappos_counnt();
+        return ls_bitmap_counnt();
     }
 }
 

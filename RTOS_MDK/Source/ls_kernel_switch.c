@@ -1,5 +1,6 @@
 #include "ARMCM3.h"
 #include "rtos.h"
+#include "ls_task.h"
 
 __asm void PendSV_Handler () {
 
@@ -62,19 +63,19 @@ first_start							/* 从开机后进入的第一个任务 */
 }
 
 
-__asm void task_enter_critical(void)
+__asm void ls_task_enter_critical(void)
 {
 	CPSID I
 	BX LR
 }
 
-__asm void task_exit_critical(void)
+__asm void ls_task_exit_critical(void)
 {
 	CPSIE I
 	BX LR
 }
 
-void first_tast_entry(void)
+void ls_first_tast_entry(void)
 {
 	/* 设置PSP栈为0，方便判断是不是复位后才开始 */
 	__set_PSP(0);
@@ -84,44 +85,29 @@ void first_tast_entry(void)
 	MEM32(NVIC_INT_CTRL) = NVIC_PENDSVSET;    /* 软件置位PENDSV的中断进行任务切换 */
 }
 
-void task_witch (void)
+void ls_task_witch (void)
 {
 	MEM32(NVIC_INT_CTRL) = NVIC_PENDSVSET;    /* 软件置位PENDSV的中断进行任务切换 */
 }
 
-extern rtos_task_t	 task1;
-extern rtos_task_t	 task2;
-extern rtos_task_t	 task_idle;
-
-extern rtos_task_t *next_task;
 
 extern uint32_t task_schedule_lock;
 
-void task_schedule(void)
+
+void ls_task_schedule(void)
 {
-	task_enter_critical();
+		ls_task_enter_critical();
 	
 		if (task_schedule_lock > 0) {
-		task_exit_critical();
+			
+		ls_task_exit_critical();
 		
 		return;
 	}
 	
-	if ((task1.task_delay != 0) && (task2.task_delay != 0)) {
-		
-		next_task = &task_idle;
-		
-	} else if (task1.task_delay != 0) {
-		
-		next_task = &task2;
-		
-	} else if (task2.task_delay != 0) {
 	
-		next_task = &task1;
-	} else {
-		next_task = &task1;
-	}
-	
-	task_witch ();
-	task_exit_critical();
+	next_task = ls_task_high_redy();
+
+	ls_task_witch ();
+	ls_task_exit_critical();
 }
