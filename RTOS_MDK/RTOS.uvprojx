@@ -384,16 +384,6 @@
               <FilePath>.\Source\main.c</FilePath>
             </File>
             <File>
-              <FileName>rtos_switch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Source\rtos_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>bit_map.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Source\bit_map.c</FilePath>
-            </File>
-            <File>
               <FileName>ls_list.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\ls_list.c</FilePath>
@@ -412,6 +402,16 @@
               <FileName>app.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\app.c</FilePath>
+            </File>
+            <File>
+              <FileName>ls_kernel_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_kernel_switch.c</FilePath>
+            </File>
+            <File>
+              <FileName>ls_bit_map.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_bit_map.c</FilePath>
             </File>
           </Files>
         </Group>

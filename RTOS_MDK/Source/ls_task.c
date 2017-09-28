@@ -35,7 +35,7 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 	
 	p_task->task_pro = prio;
 	p_task->p_stack = p_task_stack;
-	p_task->task_delay = 0;
+	p_task->task_delay_ticks = 0;
 	task_list[prio] = p_task;
 	ls_bitmap_set(&g_bit_map, prio);
 }
@@ -59,5 +59,15 @@ void ls_task_schedule_enable (void)
 	if (task_schedule_lock > 0) {
 		task_schedule_lock--;
 	}
+}
+
+void ls_task_sched_rdy(ls_task_t *p_task)
+{
+	ls_bitmap_set(&g_bit_map, p_task->task_pro);
+}
+
+void ls_task_sched_unrdy(ls_task_t *p_task)
+{
+	ls_bitmap_clr(&g_bit_map, p_task->task_pro);
 }
 

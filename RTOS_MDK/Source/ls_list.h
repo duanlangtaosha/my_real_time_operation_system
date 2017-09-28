@@ -3,8 +3,18 @@
 
 #include "stdint.h"
 
+#define LS_TASK_RDY			(1UL)
+#define LS_TASK_DELAY   (2UL)
+
+
+
+
+
 #define LS_LIST_FIRST_NODE  head_node.next_node
 #define LS_LIST_LAST_NODE   head_node.pre_node
+
+#define LS_GET_PARENT_STRUCT_ADDR(node, parent_struct, son)  \
+				(parent_struct*)((uint32_t)node - (uint32_t)(&(((parent_struct*)0)->son)))
 
 typedef struct __ls_node {
 
@@ -38,7 +48,7 @@ void ls_list_insert_node_pre (ls_list_t *p_list, ls_node_t *p_current_node, ls_n
 
 void ls_list_insert_node_next (ls_list_t *p_list, ls_node_t *p_current_node, ls_node_t *p_insert_node);
 
-void ls_list_remove_first (ls_list_t *p_list);
+ls_node_t* ls_list_remove_first (ls_list_t *p_list);
 
 void ls_list_remove_last (ls_list_t *p_list);
 

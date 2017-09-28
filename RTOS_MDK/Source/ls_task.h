@@ -8,9 +8,9 @@ typedef struct __ls_task {
 
 	uint32_t *p_stack;
 	
-	uint32_t  task_delay;
+	uint32_t  task_delay_ticks;
 	
-	ls_node_t delay_node;
+	ls_node_t task_delay_node;
 	
 	uint32_t task_pro;
 	
@@ -30,6 +30,10 @@ ls_task_t* ls_task_high_redy(void);
 void ls_task_schedule_disable (void);
 
 void ls_task_schedule_enable (void);
+
+void ls_task_sched_rdy(ls_task_t *p_task);
+
+void ls_task_sched_unrdy(ls_task_t *p_task);
 
 #endif
 

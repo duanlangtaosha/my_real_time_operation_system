@@ -73,6 +73,7 @@ int test = 0;
 int main(){
 	
 	ls_bitmap_init(&g_bit_map);
+	ls_init_delay_list ();
 	
 	ls_task_init(&task1, &task1_stack[1024], 0, task1_func, (void*)0x11111111);
 	
