@@ -39,6 +39,12 @@ void task1_func()
 }
 
 uint32_t test_public_varaible = 0;
+
+void delay()
+{
+	uint32_t i = 0xFFFF;
+	while(i--);
+}
 void task2_func()
 {
 
@@ -46,13 +52,13 @@ void task2_func()
 		uint32_t i = 0xFFFF;
 		uint32_t count = 0;
 		
-
-		ls_task_schedule_disable();
-		count = test_public_varaible;
-		while(i--);
-		
-		test_public_varaible = count + 1;
-		ls_task_schedule_enable();
+delay();
+//		ls_task_schedule_disable();
+//		count = test_public_varaible;
+//		while(i--);
+//		
+//		test_public_varaible = count + 1;
+//		ls_task_schedule_enable();
 
 		flag2 = 1;
 		ls_delayms(2);
@@ -70,13 +76,13 @@ void task3_func()
 		uint32_t i = 0xFFFF;
 		uint32_t count = 0;
 		
-
-		ls_task_schedule_disable();
-		count = test_public_varaible;
-		while(i--);
-		
-		test_public_varaible = count + 1;
-		ls_task_schedule_enable();
+delay();
+//		ls_task_schedule_disable();
+//		count = test_public_varaible;
+//		while(i--);
+//		
+//		test_public_varaible = count + 1;
+//		ls_task_schedule_enable();
 
 		flag3 = 1;
 		ls_delayms(2);
