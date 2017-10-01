@@ -30,8 +30,11 @@ typedef struct __ls_list {
 	
 }ls_list_t;
 
-
+/*
+ *	\brief 初始化节点
+ */
 void ls_node_init (ls_node_t *p_node);
+
 void ls_list_init (ls_list_t *p_list);
 
 ls_node_t* ls_list_first_node (ls_list_t *p_list);

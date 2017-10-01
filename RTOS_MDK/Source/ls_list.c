@@ -2,7 +2,19 @@
 #include "rtos.h"
 #include "lib.h"
 #include "ls_list.h"
- 
+
+/*
+ *	\brief 初始化链表
+ */
+void ls_node_init (ls_node_t *p_node)
+{
+	p_node->next_node = p_node;
+	p_node->pre_node  = p_node;
+}
+
+/*
+ *	\brief 初始化链表
+ */
 void ls_list_init (ls_list_t *p_list)
 {
 	p_list->LS_LIST_FIRST_NODE = &p_list->head_node;
@@ -91,6 +103,9 @@ void ls_list_insert_node_next (ls_list_t *p_list, ls_node_t *p_current_node, ls_
 	p_list->node_count++;
 }
 
+/*
+ *	\brief 从链表中移除第一个节点
+ */
 ls_node_t* ls_list_remove_first (ls_list_t *p_list)
 {
 	ls_node_t  *node = (ls_node_t*)0;
@@ -103,7 +118,8 @@ ls_node_t* ls_list_remove_first (ls_list_t *p_list)
 	
 	p_list->LS_LIST_FIRST_NODE = p_list->LS_LIST_FIRST_NODE->next_node;
 	
-	p_list->LS_LIST_FIRST_NODE->next_node->pre_node = &p_list->head_node;
+//	p_list->LS_LIST_FIRST_NODE->next_node->pre_node = &p_list->head_node;
+	node->next_node->pre_node = &p_list->head_node ;
 	
 	p_list->node_count--;
 	
@@ -111,6 +127,9 @@ ls_node_t* ls_list_remove_first (ls_list_t *p_list)
 
 }
 
+/*
+ *	\brief 从链表中移除最后一个节点
+ */
 void ls_list_remove_last (ls_list_t *p_list)
 {
 	if (p_list->node_count == 0) {
