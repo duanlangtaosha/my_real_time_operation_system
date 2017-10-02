@@ -22,9 +22,15 @@ ls_task_t *next_task;
 /**< \brief 任务时间片节点 */
 ls_list_t task_table[LS_TASK_COUNT];
 
+/**< \brief 当前实时操作系统中任务总数 */
+uint32_t g_rtos_task_count = 0;
 
+/**< \brief 记录当前系统中存在的任务 */
+ls_list_t ls_rtos_task_list;
 
 extern ls_bitmap g_bit_map;
+
+uint32_t ls_bit_pro_check = 0;
 
 
 /*
@@ -32,6 +38,7 @@ extern ls_bitmap g_bit_map;
  */
 void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param)
 {
+	
 	*(--p_task_stack) = (uint32_t)(1 << 24);
 	*(--p_task_stack) = (uint32_t)func_entry;
 	*(--p_task_stack) = (uint32_t)14;		     /* R14(LR)*/
@@ -68,6 +75,20 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 	
 	/* 初始化任务链表 */
 	ls_list_insert_node_last(&task_table[prio], &p_task->task_time_slice_node);
+	
+	/**< \brief 当前实时操作系统中任务总数 */
+  g_rtos_task_count++;
+	
+	
+	if (!(ls_bit_pro_check & (1 << prio))) {
+		
+		ls_bit_pro_check |= (1 << prio);
+		
+		/**< \brief 记录当前任务的信息 */
+		ls_list_insert_node_first(&ls_rtos_task_list, &p_task->task_myself_node);
+	}
+	
+
 	
 }
 
@@ -145,8 +166,24 @@ void ls_task_sched_init (void)
 	for (i = 0; i < LS_TASK_COUNT; i++) {
 	
 		ls_list_init(&task_table[i]);
-	}
+	}	
+}
+
+/*
+ *	获取当前系统任务个数
+ */
+uint32_t ls_get_rtos_task_count (void)
+{
+	return g_rtos_task_count;
+}
+
+/*
+ *	初始化系统任务统计链表
+ */
+void ls_rtos_task_list_init (void)
+{
+	ls_node_init(&ls_rtos_task_list.head_node);
 	
-	
+	ls_list_init(&ls_rtos_task_list);
 }
 

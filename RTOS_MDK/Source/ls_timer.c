@@ -69,6 +69,7 @@ void SysTick_Handler ()
 {
 
 		ls_node_t *temp_node ;
+		ls_node_t *rtos_task_myself_node;
 	
 		uint32_t count = 0;
 	
@@ -96,22 +97,50 @@ void SysTick_Handler ()
 			temp_node = temp_node->next_node;
 		}
 		
-		if (--current_task->task_slice == 0) {
+		rtos_task_myself_node = ls_list_first_node(&ls_rtos_task_list);
+
+		
+		/* 当前系统中总共有多少个优先级被挂起 */
+		for (count = ls_rtos_task_list.node_count ; count > 1; count--) {
+		
+			/* 获取出优先级所在的任务 */
+			ls_task_t *temp_task  = LS_GET_PARENT_STRUCT_ADDR(rtos_task_myself_node, ls_task_t, task_myself_node); 
 			
-//			current_task->task_pro
-//			task_table
+			/* 获取某个优先级下，该任务链表中的首个任务 */
+			temp_node = ls_list_first_node(&task_table[temp_task->task_pro]);
 			
-			ls_node_t *temp_node;
-			
-			current_task->task_slice = TASK_TIME_SLICE_MAX;
-			
-			/* 移除当前优先级任务链表中的首节点 */
-			temp_node = ls_list_remove_first(&task_table[current_task->task_pro]);
-			
-			/* 把移除的节点添加到当前优先级链表的末尾 */
-			ls_list_insert_node_last(&task_table[current_task->task_pro], &current_task->task_time_slice_node);
-//			ls_task_t 
+			/* 获取出任务链表中的当前处于首个节点的任务 */
+			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
+
+			if (--temp_task->task_slice == 0) {
+
+				temp_task->task_slice = TASK_TIME_SLICE_MAX;
+
+				/* 移除当前优先级任务链表中的首节点 */
+				temp_node = ls_list_remove_first(&task_table[temp_task->task_pro]);
+
+				/* 把移除的节点添加到当前优先级链表的末尾 */
+				ls_list_insert_node_last(&task_table[temp_task->task_pro], &temp_task->task_time_slice_node);
+			}
+			rtos_task_myself_node = rtos_task_myself_node->next_node;
 		}
+		
+//		if (--current_task->task_slice == 0) {
+//			
+////			current_task->task_pro
+////			task_table
+//			
+//			ls_node_t *temp_node;
+//			
+//			current_task->task_slice = TASK_TIME_SLICE_MAX;
+//			
+//			/* 移除当前优先级任务链表中的首节点 */
+//			temp_node = ls_list_remove_first(&task_table[current_task->task_pro]);
+//			
+//			/* 把移除的节点添加到当前优先级链表的末尾 */
+//			ls_list_insert_node_last(&task_table[current_task->task_pro], &current_task->task_time_slice_node);
+////			ls_task_t 
+//		}
 	
 		
 		/* 退出临界区 */

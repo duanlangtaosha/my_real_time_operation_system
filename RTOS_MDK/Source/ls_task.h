@@ -28,6 +28,9 @@ typedef struct __ls_task {
 	/** \brief 任务时间片节点 */
 	ls_node_t task_time_slice_node;
 	
+	/** \brief 记录当系统任务的当前任务节点 */
+	ls_node_t task_myself_node;
+	
 }ls_task_t;
 
 typedef uint32_t ls_stack_t;
@@ -35,6 +38,9 @@ extern ls_task_t *current_task;
 extern ls_task_t *next_task;
 
 extern ls_list_t task_table[LS_TASK_COUNT];
+
+/**< \brief 记录当前系统中存在的任务 */
+extern ls_list_t ls_rtos_task_list;
 
 
 void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
@@ -50,6 +56,16 @@ void ls_task_sched_rdy(ls_task_t *p_task);
 void ls_task_sched_unrdy(ls_task_t *p_task);
 
 void ls_task_sched_init (void);
+
+/*
+ *	获取当前系统任务个数
+ */
+uint32_t ls_get_rtos_task_count (void);
+
+/*
+ *	初始化系统任务统计链表
+ */
+void ls_rtos_task_list_init (void);
 
 #endif
 
