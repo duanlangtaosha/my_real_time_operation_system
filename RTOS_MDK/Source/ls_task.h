@@ -4,6 +4,11 @@
 #include "ls_list.h"
 #include "ls_rtos.h"
 #include "stdint.h"
+#include "ls_error.h"
+
+#define LS_TASK_RDY			(1 << 0)
+#define LS_TASK_DELAY   (1 << 1)
+#define LS_TASK_SUSPEND (1 << 2)
 
 typedef struct __ls_task {
 
@@ -31,6 +36,9 @@ typedef struct __ls_task {
 	/** \brief 记录当系统任务的当前任务节点 */
 	ls_node_t task_myself_node;
 	
+	/** \brief 记录任务的挂起的数量 */
+	uint32_t ls_task_suspend_count;
+	
 }ls_task_t;
 
 typedef uint32_t ls_stack_t;
@@ -45,27 +53,68 @@ extern ls_list_t ls_rtos_task_list;
 
 void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
 
+/*
+ *	\brief 获取当前就绪表中最高优先级的任务
+ *  \prame[in]  none
+ *  \ret   返回最高优先级任务的任务指针
+ */
 ls_task_t* ls_task_high_redy(void);
 
+/*
+ *	\brief 任务调度失能
+ *  \prame[in]  none
+ *  \ret   none
+ */
 void ls_task_schedule_disable (void);
 
+/*
+ *	\brief 任务调度使能
+ *  \prame[in]  none
+ *  \ret   none
+ */
 void ls_task_schedule_enable (void);
 
+
+/*
+ *	\brief 任务变为就绪状态
+ *  \prame[in]  要恢复为就绪状态的任务的指针
+ *  \ret   none
+ */
 void ls_task_sched_rdy(ls_task_t *p_task);
 
+/*
+ *	\brief 任务从就绪状态变为非就绪状态
+ *  \prame[in]  要从任务就绪表中删除的任务的任务指针
+ *  \ret   none
+ */
 void ls_task_sched_unrdy(ls_task_t *p_task);
 
+
+/*
+ *	\brief 初始化任务调度
+ *  \prame[in]  none
+ *  \ret   none
+ */
 void ls_task_sched_init (void);
 
 /*
- *	获取当前系统任务个数
+ *	\brief 获取当前系统任务个数
+ *  \prame[in]  none
+ *  \ret   返回当前操作系统中使用的优先级个数
  */
 uint32_t ls_get_rtos_task_count (void);
 
 /*
- *	初始化系统任务统计链表
+ *	\brief 初始化系统任务统计链表
+ *  \prame[in]  none
+ *  \ret   none
  */
 void ls_rtos_task_list_init (void);
+
+
+ls_error_t ls_task_suspend(ls_task_t* p_task);
+
+void ls_task_resume(ls_task_t* p_task);
 
 #endif
 

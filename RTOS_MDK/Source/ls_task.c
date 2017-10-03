@@ -4,6 +4,7 @@
 #include "ls_list.h"
 #include "ls_rtos.h"
 #include "ls_task.h"
+#include "ls_error.h"
 
 
 
@@ -87,9 +88,6 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 		/**< \brief 记录当前任务的信息 */
 		ls_list_insert_node_first(&ls_rtos_task_list, &p_task->task_myself_node);
 	}
-	
-
-	
 }
 
 
@@ -185,5 +183,51 @@ void ls_rtos_task_list_init (void)
 	ls_node_init(&ls_rtos_task_list.head_node);
 	
 	ls_list_init(&ls_rtos_task_list);
+}
+
+/*
+ *	\brief 任务挂起
+ */
+ls_error_t ls_task_suspend(ls_task_t* p_task)
+{
+	ls_task_enter_critical();
+	
+	if (p_task->task_state & LS_TASK_DELAY) {
+		return -LS_INCORRECT_STA;
+	}
+	
+	if (++p_task->ls_task_suspend_count <= 1) {
+		p_task->task_state |= LS_TASK_SUSPEND;
+		ls_task_sched_unrdy(p_task);
+	}
+	
+	ls_task_exit_critical();
+	
+	if (current_task == p_task) {
+		ls_task_schedule();
+	}
+	
+	return LS_OK;
+}
+
+/*
+ *	\brief 任务恢复
+ */
+void ls_task_resume(ls_task_t* p_task)
+{
+	
+	ls_task_enter_critical();
+	
+	if (p_task->task_state & LS_TASK_SUSPEND) {
+		
+		ls_task_sched_rdy(p_task);
+	  p_task->task_state &= ~LS_TASK_SUSPEND;
+	
+		if (p_task->task_pro < current_task->task_pro) {
+			ls_task_schedule();
+		}
+  }
+	
+	ls_task_exit_critical();
 }
 

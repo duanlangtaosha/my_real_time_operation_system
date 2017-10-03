@@ -3,8 +3,7 @@
 
 #include "stdint.h"
 
-#define LS_TASK_RDY			(1UL)
-#define LS_TASK_DELAY   (2UL)
+
 
 
 

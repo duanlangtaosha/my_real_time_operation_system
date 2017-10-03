@@ -31,8 +31,10 @@ int flag5  = 0;
 void task1_func()
 {
 	tSetSysTickPeriod(10);
+	
 	for (; ;) {
 		
+		ls_task_suspend(&task1);
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
@@ -53,15 +55,6 @@ void task2_func()
 
 	for (; ;) {
 
-		
-//delay();
-//		ls_task_schedule_disable();
-//		count = test_public_varaible;
-//		while(i--);
-//		
-//		test_public_varaible = count + 1;
-//		ls_task_schedule_enable();
-
 		flag2 = 1;
 		ls_delayms(2);
 		flag2 = 0;
@@ -76,15 +69,6 @@ void task3_func()
 
 	for (; ;) {
 
-		
-//delay();
-//		ls_task_schedule_disable();
-//		count = test_public_varaible;
-//		while(i--);
-//		
-//		test_public_varaible = count + 1;
-//		ls_task_schedule_enable();
-
 		flag3 = 1;
 		ls_delayms(2);
 		flag3 = 0;
@@ -98,7 +82,7 @@ void task4_func()
 {
 
 	for (; ;) {
-
+//	  ls_task_resume(&task1);
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;
@@ -133,7 +117,7 @@ int main(){
 	
 	ls_task_init(&task3, &task3_stack[1024], 1, task3_func, (void*)0x33333333);
 	
-	ls_task_init(&task4, &task4_stack[1024], 1, task4_func, (void*)0x44444444);
+	ls_task_init(&task4, &task4_stack[1024], 2, task4_func, (void*)0x44444444);
 	
 	ls_task_init(&task_idle, &task_idle_stack[1024], 31, task_idle_func, (void*)0x22222222);
 	
