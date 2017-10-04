@@ -31,7 +31,7 @@ ls_list_t ls_rtos_task_list;
 
 extern ls_bitmap g_bit_map;
 
-uint32_t ls_bit_pro_check = 0;
+//uint32_t ls_bit_pro_check = 0;
 
 
 /*
@@ -60,8 +60,12 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 	p_task->task_pro = prio;
 	p_task->p_stack = p_task_stack;
 	p_task->task_delay_ticks = 0;
-//	task_list[prio] = p_task;
+
 	ls_bitmap_set(&g_bit_map, prio);
+	
+	p_task->ls_task_suspend_count = 0;
+	
+	p_task->task_state = LS_TASK_RDY;
 	
 	/* 初始化延时列表的节点，其实不初始化也可以, 但是存在一个问题，它的上一个前指针和后
 	 * 后指针不是指向它自己，再以后的操作中可能遇到问题。
@@ -81,13 +85,13 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
   g_rtos_task_count++;
 	
 	
-	if (!(ls_bit_pro_check & (1 << prio))) {
-		
-		ls_bit_pro_check |= (1 << prio);
-		
-		/**< \brief 记录当前任务的信息 */
-		ls_list_insert_node_first(&ls_rtos_task_list, &p_task->task_myself_node);
-	}
+//	if (!(ls_bit_pro_check & (1 << prio))) {
+//		
+//		ls_bit_pro_check |= (1 << prio);
+//		
+//		/**< \brief 记录当前任务的信息 */
+//		ls_list_insert_node_first(&ls_rtos_task_list, &p_task->task_myself_node);
+//	}
 }
 
 
@@ -135,7 +139,14 @@ void ls_task_schedule_enable (void)
  */
 void ls_task_sched_rdy(ls_task_t *p_task)
 {
+	ls_task_enter_critical();
+	
+	/* 把节点重新加入任务优先级的链表 */
+	ls_list_insert_node_last(&task_table[p_task->task_pro], &p_task->task_time_slice_node);
+	
 	ls_bitmap_set(&g_bit_map, p_task->task_pro);
+	
+	ls_task_exit_critical();
 }
 
 
@@ -144,7 +155,16 @@ void ls_task_sched_rdy(ls_task_t *p_task)
  */
 void ls_task_sched_unrdy(ls_task_t *p_task)
 {
+	ls_task_enter_critical();
+	
+	ls_list_remove_node(&task_table[p_task->task_pro], &p_task->task_time_slice_node);
+	
+	if (ls_list_get_node_count(&task_table[p_task->task_pro]) == 0) {
+	
 	ls_bitmap_clr(&g_bit_map, p_task->task_pro);
+	}
+	
+	ls_task_exit_critical();
 }
 
 /*

@@ -148,8 +148,13 @@ void ls_list_remove_node (ls_list_t *p_list, ls_node_t *p_node)
 	if (p_list->node_count == 0) {
 		return;
 	}
-	p_node->pre_node = p_node->next_node;
+//	p_node->pre_node = p_node->next_node;
+//	p_node->next_node->pre_node = p_node->pre_node;
+	p_node->pre_node->next_node = p_node->next_node;
 	p_node->next_node->pre_node = p_node->pre_node;
+	
+//	p_node->next_node = p_node;
+//	p_node->pre_node = p_node;
 	
 	p_list->node_count--;
 

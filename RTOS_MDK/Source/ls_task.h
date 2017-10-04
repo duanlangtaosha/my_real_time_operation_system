@@ -33,8 +33,8 @@ typedef struct __ls_task {
 	/** \brief 任务时间片节点 */
 	ls_node_t task_time_slice_node;
 	
-	/** \brief 记录当系统任务的当前任务节点 */
-	ls_node_t task_myself_node;
+//	/** \brief 记录当系统任务的当前任务节点 */
+//	ls_node_t task_myself_node;
 	
 	/** \brief 记录任务的挂起的数量 */
 	uint32_t ls_task_suspend_count;
@@ -47,8 +47,8 @@ extern ls_task_t *next_task;
 
 extern ls_list_t task_table[LS_TASK_COUNT];
 
-/**< \brief 记录当前系统中存在的任务 */
-extern ls_list_t ls_rtos_task_list;
+///**< \brief 记录当前系统中存在的任务 */
+//extern ls_list_t ls_rtos_task_list;
 
 
 void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
@@ -104,12 +104,12 @@ void ls_task_sched_init (void);
  */
 uint32_t ls_get_rtos_task_count (void);
 
-/*
- *	\brief 初始化系统任务统计链表
- *  \prame[in]  none
- *  \ret   none
- */
-void ls_rtos_task_list_init (void);
+///*
+// *	\brief 初始化系统任务统计链表
+// *  \prame[in]  none
+// *  \ret   none
+// */
+//void ls_rtos_task_list_init (void);
 
 
 ls_error_t ls_task_suspend(ls_task_t* p_task);

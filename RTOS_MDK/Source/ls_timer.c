@@ -32,7 +32,8 @@ void ls_init_delay_list (void)
  */
 void ls_task_timer_wait(ls_task_t *p_task, uint32_t delay_ticks)
 {
-	ls_list_insert_node_first(&g_delay_list, &p_task->task_delay_node);
+//	ls_list_insert_node_first(&g_delay_list, &p_task->task_delay_node);
+	ls_list_insert_node_last(&g_delay_list, &p_task->task_delay_node);
 	p_task->task_delay_ticks = delay_ticks;
 	p_task->task_state |= LS_TASK_DELAY;
 
@@ -69,12 +70,43 @@ void SysTick_Handler ()
 {
 
 		ls_node_t *temp_node ;
-		ls_node_t *rtos_task_myself_node;
+//		ls_node_t *rtos_task_myself_node;
 	
 		uint32_t count = 0;
 	
 		/* 进入临界区 */
 		ls_task_enter_critical();
+	
+	
+//			rtos_task_myself_node = ls_list_first_node(&ls_rtos_task_list);
+
+		
+//		/* 当前系统中总共有多少个优先级被挂起 */
+//		for (count = ls_rtos_task_list.node_count ; count > 0; count--) {
+//		
+//			/* 获取出优先级所在的任务 */
+//			ls_task_t *temp_task  = LS_GET_PARENT_STRUCT_ADDR(rtos_task_myself_node, ls_task_t, task_myself_node); 
+//			
+//			/* 获取某个优先级下，该任务链表中的首个任务 */
+//			temp_node = ls_list_first_node(&task_table[temp_task->task_pro]);
+//			
+//			/* 获取出任务链表中的当前处于首个节点的任务 */
+//			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
+
+//			if (--temp_task->task_slice == 0) {
+
+//				temp_task->task_slice = TASK_TIME_SLICE_MAX;
+
+//				/* 移除当前优先级任务链表中的首节点 */
+//				temp_node = ls_list_remove_first(&task_table[temp_task->task_pro]);
+
+//				/* 把移除的节点添加到当前优先级链表的末尾 */
+//				ls_list_insert_node_last(&task_table[temp_task->task_pro], &temp_task->task_time_slice_node);
+//			}
+//			rtos_task_myself_node = rtos_task_myself_node->next_node;
+//		}
+	
+	
 	
 		/* 获取出延时表中的第一个延时节点  */
 		temp_node = ls_list_first_node(&g_delay_list);
@@ -86,8 +118,8 @@ void SysTick_Handler ()
 			
 			if (--(temp_task->task_delay_ticks) == 0 ) {
 			
-				/* 如果任务延时时间到了, 就从延时表中移除 */
-				ls_list_remove_first(&g_delay_list);
+//				/* 如果任务延时时间到了, 就从延时表中移除 */
+//				ls_list_remove_first(&g_delay_list);
 				
 				/* 从延时状态中唤醒 */
 				ls_task_timer_weakup(temp_task);
@@ -97,51 +129,25 @@ void SysTick_Handler ()
 			temp_node = temp_node->next_node;
 		}
 		
-		rtos_task_myself_node = ls_list_first_node(&ls_rtos_task_list);
-
 		
-		/* 当前系统中总共有多少个优先级被挂起 */
-		for (count = ls_rtos_task_list.node_count ; count > 1; count--) {
+		if (--(current_task->task_slice) == 0) {
 		
-			/* 获取出优先级所在的任务 */
-			ls_task_t *temp_task  = LS_GET_PARENT_STRUCT_ADDR(rtos_task_myself_node, ls_task_t, task_myself_node); 
+			current_task->task_slice = TASK_TIME_SLICE_MAX;
 			
-			/* 获取某个优先级下，该任务链表中的首个任务 */
-			temp_node = ls_list_first_node(&task_table[temp_task->task_pro]);
+//			/* 获取某个优先级下，该任务链表中的首个任务 */
+//			temp_node = ls_list_first_node(&task_table[current_task->task_pro]);
+//			
+//			/* 获取出任务链表中的当前处于首个节点的任务 */
+//			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
 			
-			/* 获取出任务链表中的当前处于首个节点的任务 */
-			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
-
-			if (--temp_task->task_slice == 0) {
-
-				temp_task->task_slice = TASK_TIME_SLICE_MAX;
-
-				/* 移除当前优先级任务链表中的首节点 */
-				temp_node = ls_list_remove_first(&task_table[temp_task->task_pro]);
+			  /* 移除当前优先级任务链表中的首节点 */
+				temp_node = ls_list_remove_first(&task_table[current_task->task_pro]);
 
 				/* 把移除的节点添加到当前优先级链表的末尾 */
-				ls_list_insert_node_last(&task_table[temp_task->task_pro], &temp_task->task_time_slice_node);
-			}
-			rtos_task_myself_node = rtos_task_myself_node->next_node;
+				ls_list_insert_node_last(&task_table[current_task->task_pro], temp_node);
 		}
+
 		
-//		if (--current_task->task_slice == 0) {
-//			
-////			current_task->task_pro
-////			task_table
-//			
-//			ls_node_t *temp_node;
-//			
-//			current_task->task_slice = TASK_TIME_SLICE_MAX;
-//			
-//			/* 移除当前优先级任务链表中的首节点 */
-//			temp_node = ls_list_remove_first(&task_table[current_task->task_pro]);
-//			
-//			/* 把移除的节点添加到当前优先级链表的末尾 */
-//			ls_list_insert_node_last(&task_table[current_task->task_pro], &current_task->task_time_slice_node);
-////			ls_task_t 
-//		}
-	
 		
 		/* 退出临界区 */
 		ls_task_exit_critical();

@@ -55,10 +55,14 @@ void task2_func()
 
 	for (; ;) {
 
+		
 		flag2 = 1;
-		ls_delayms(2);
+//		ls_delayms(2);
+		delay();
 		flag2 = 0;
-		ls_delayms(2);
+//		ls_delayms(2);
+		delay();
+//		ls_delayms(1);
 
 	}
 	
@@ -67,12 +71,16 @@ void task2_func()
 void task3_func()
 {
 
+	ls_task_resume(&task1);
 	for (; ;) {
-
+//		delay();
 		flag3 = 1;
-		ls_delayms(2);
+//		ls_delayms(2);
+		delay();
 		flag3 = 0;
-		ls_delayms(2);
+//		ls_delayms(2);
+		delay();
+//		ls_delayms(1);
 
 	}
 	
@@ -82,7 +90,7 @@ void task4_func()
 {
 
 	for (; ;) {
-//	  ls_task_resume(&task1);
+
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;
@@ -108,7 +116,6 @@ int main(){
 	/* 初始化任务调度 */
 	ls_task_sched_init();
 	
-//	ls_bitmap_init(&g_bit_map);
 	ls_init_delay_list ();
 	
 	ls_task_init(&task1, &task1_stack[1024], 0, task1_func, (void*)0x11111111);
@@ -117,8 +124,8 @@ int main(){
 	
 	ls_task_init(&task3, &task3_stack[1024], 1, task3_func, (void*)0x33333333);
 	
-	ls_task_init(&task4, &task4_stack[1024], 2, task4_func, (void*)0x44444444);
-	
+	ls_task_init(&task4, &task4_stack[1024], 0, task4_func, (void*)0x44444444);
+//	
 	ls_task_init(&task_idle, &task_idle_stack[1024], 31, task_idle_func, (void*)0x22222222);
 	
 	next_task = ls_task_high_redy();

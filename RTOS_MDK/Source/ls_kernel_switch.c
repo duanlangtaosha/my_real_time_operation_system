@@ -96,17 +96,23 @@ extern uint32_t task_schedule_lock;
 
 void ls_task_schedule(void)
 {
-		ls_task_enter_critical();
-	
-		if (task_schedule_lock > 0) {
-			
-		ls_task_exit_critical();
+	ls_task_t *temp_task;
+	ls_task_enter_critical();
+
+	if (task_schedule_lock > 0) {
 		
+		ls_task_exit_critical();
+
 		return;
 	}
 	
 	
-	next_task = ls_task_high_redy();
+	temp_task = ls_task_high_redy();
+	
+	if (temp_task != current_task) {
+	
+		next_task = temp_task;
+	}
 
 	ls_task_witch ();
 	ls_task_exit_critical();
