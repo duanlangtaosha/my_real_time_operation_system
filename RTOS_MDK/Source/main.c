@@ -33,6 +33,7 @@ void clean(void * param)
 	flag1 = 1;
 }
 
+ls_task_info_t task_info;
 
 void task1_func()
 {
@@ -40,12 +41,13 @@ void task1_func()
 	
 	for (; ;) {
 		
-//		ls_task_suspend(&task1);
+		ls_task_suspend(&task1);
+//		ls_task_get_info(&task1, &task_info);
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
 		ls_delayms(2);
-
+		
 	}
 }
 
@@ -80,8 +82,9 @@ void task2_func()
 
 void task3_func()
 {
-
-//	ls_task_resume(&task1);
+	ls_task_get_info(&task1, &task_info);
+	ls_task_resume(&task1);
+	ls_task_get_info(&task1, &task_info);
 	for (; ;) {
 
 		flag3 = 1;

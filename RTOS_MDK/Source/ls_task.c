@@ -208,7 +208,7 @@ ls_error_t ls_task_suspend(ls_task_t* p_task)
 		return -LS_INCORRECT_STA;
 	}
 	
-	if (++p_task->ls_task_suspend_count <= 1) {
+	if (++(p_task->ls_task_suspend_count) <= 1) {
 		p_task->task_state |= LS_TASK_SUSPEND;
 		ls_task_sched_unrdy(p_task);
 	}
@@ -232,11 +232,14 @@ void ls_task_resume(ls_task_t* p_task)
 	
 	if (p_task->task_state & LS_TASK_SUSPEND) {
 		
-		ls_task_sched_rdy(p_task);
-	  p_task->task_state &= ~LS_TASK_SUSPEND;
-	
-		if (p_task->task_pro < current_task->task_pro) {
-			ls_task_schedule();
+		if (--(p_task->ls_task_suspend_count) == 0) {
+
+			ls_task_sched_rdy(p_task);
+			p_task->task_state &= ~LS_TASK_SUSPEND;
+
+			if (p_task->task_pro < current_task->task_pro) {
+				ls_task_schedule();
+			}
 		}
   }
 	
@@ -324,3 +327,21 @@ void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void 
 	ls_task_exit_critical();
 
 }
+
+
+/*
+ *	\brief 获取任务的状态
+ */
+void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info)
+{
+	ls_task_enter_critical();
+	
+	p_info->task_pro = p_task->task_pro;
+	p_info->task_state = p_task->task_state;
+	p_info->task_slice = p_task->task_slice;
+	p_info->task_delay_ticks = p_task->task_delay_ticks;
+	p_info->task_suspend_count = p_task->ls_task_suspend_count;
+	
+	ls_task_exit_critical();
+}
+

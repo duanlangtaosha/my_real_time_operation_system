@@ -47,6 +47,16 @@ typedef struct __ls_task {
 	
 }ls_task_t;
 
+
+typedef struct __ls_task_info {
+	uint32_t task_pro;
+	uint32_t task_state;
+	uint32_t task_delay_ticks;
+	uint32_t task_suspend_count;
+	uint32_t task_slice;
+
+}ls_task_info_t;
+
 typedef uint32_t ls_stack_t;
 extern ls_task_t *current_task;
 extern ls_task_t *next_task;
@@ -155,5 +165,9 @@ void ls_task_delete_self (ls_task_t *p_task);
  */
 void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void *p_clean_param);
 
+/*
+ *	\brief 获取任务的状态
+ */
+void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info);
 #endif
 
