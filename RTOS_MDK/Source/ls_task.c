@@ -5,6 +5,7 @@
 #include "ls_rtos.h"
 #include "ls_task.h"
 #include "ls_error.h"
+#include "ls_timer.h"
 
 
 
@@ -23,15 +24,8 @@ ls_task_t *next_task;
 /**< \brief 任务时间片节点 */
 ls_list_t task_table[LS_TASK_COUNT];
 
-/**< \brief 当前实时操作系统中任务总数 */
-uint32_t g_rtos_task_count = 0;
-
-/**< \brief 记录当前系统中存在的任务 */
-ls_list_t ls_rtos_task_list;
-
 extern ls_bitmap g_bit_map;
 
-//uint32_t ls_bit_pro_check = 0;
 
 
 /*
@@ -81,17 +75,15 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 	/* 初始化任务链表 */
 	ls_list_insert_node_last(&task_table[prio], &p_task->task_time_slice_node);
 	
-	/**< \brief 当前实时操作系统中任务总数 */
-  g_rtos_task_count++;
+	/* 初始化clean指针 */
+	p_task->clean = (void *)0;
 	
+	/* 初始化clean函数的参数 */
+	p_task->clean_param = (void *)0;
 	
-//	if (!(ls_bit_pro_check & (1 << prio))) {
-//		
-//		ls_bit_pro_check |= (1 << prio);
-//		
-//		/**< \brief 记录当前任务的信息 */
-//		ls_list_insert_node_first(&ls_rtos_task_list, &p_task->task_myself_node);
-//	}
+	/* 请求删除标志位清0 */
+	p_task->request_delete_flag = 0;
+	
 }
 
 
@@ -161,11 +153,29 @@ void ls_task_sched_unrdy(ls_task_t *p_task)
 	
 	if (ls_list_get_node_count(&task_table[p_task->task_pro]) == 0) {
 	
-	ls_bitmap_clr(&g_bit_map, p_task->task_pro);
+		ls_bitmap_clr(&g_bit_map, p_task->task_pro);
 	}
 	
 	ls_task_exit_critical();
 }
+
+/*
+ *	从就绪表中移除
+ */
+void ls_task_sched_remove(ls_task_t *p_task)
+{
+	ls_task_enter_critical();
+
+	ls_list_remove_node(&task_table[p_task->task_pro], &p_task->task_time_slice_node);
+
+	if (ls_list_get_node_count(&task_table[p_task->task_pro]) == 0) {
+
+		ls_bitmap_clr(&g_bit_map, p_task->task_pro);
+	}
+
+	ls_task_exit_critical();
+}
+
 
 /*
  *	初始化任务调度
@@ -185,24 +195,6 @@ void ls_task_sched_init (void)
 	
 		ls_list_init(&task_table[i]);
 	}	
-}
-
-/*
- *	获取当前系统任务个数
- */
-uint32_t ls_get_rtos_task_count (void)
-{
-	return g_rtos_task_count;
-}
-
-/*
- *	初始化系统任务统计链表
- */
-void ls_rtos_task_list_init (void)
-{
-	ls_node_init(&ls_rtos_task_list.head_node);
-	
-	ls_list_init(&ls_rtos_task_list);
 }
 
 /*
@@ -251,3 +243,84 @@ void ls_task_resume(ls_task_t* p_task)
 	ls_task_exit_critical();
 }
 
+/*
+ *	\brief 强制删除
+ */
+void ls_task_force_delete(ls_task_t *p_task)
+{
+	ls_task_enter_critical();
+	
+	/* 如果任务在延时状态 */
+	if (p_task->task_state & LS_TASK_DELAY) {
+		ls_task_time_remove(p_task);
+		
+		/* 如果任务不在挂起状态，则任务在就绪或者运行状态 */
+	} else if (!(p_task->task_state & LS_TASK_SUSPEND)) {
+		ls_task_sched_remove(p_task);
+	}
+	
+	/* 如果清理函数不为空 */
+	if (p_task->clean) {
+		p_task->clean(p_task->clean_param);
+	}
+	
+	/* 如果删除的是自己就直接切换 */
+	if (p_task == current_task) {
+	
+		ls_task_schedule();
+	}
+	
+	ls_task_exit_critical();
+}
+
+/*
+ *	\brief 请求删除
+ */
+void ls_task_request_delete(ls_task_t *p_task)
+{
+	p_task->request_delete_flag = 1;
+}
+
+/*
+ *	\brief 判断是否有请求删除标志
+ */
+uint32_t ls_check_task_request_flag(ls_task_t *p_task)
+{
+	return p_task->request_delete_flag;
+
+}
+
+/*
+ * \brief 删除自己
+ */
+void ls_task_delete_self (ls_task_t *p_task)
+{
+	ls_task_enter_critical();
+	
+	/* 因为是删除自己，所以说自己应该在运行态 */
+	ls_task_sched_remove(p_task);
+	
+	if (p_task->clean) {
+		p_task->clean(p_task->clean_param);
+	}
+	
+	ls_task_schedule();
+	
+	ls_task_exit_critical();
+	
+}
+
+/*
+ *	\brief 设置清理函数的回调函数
+ */
+void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void *p_clean_param)
+{
+	ls_task_enter_critical();
+	
+	p_task->clean = p_clean;
+	p_task->clean_param = p_clean_param;
+	
+	
+	ls_task_exit_critical();
+
+}

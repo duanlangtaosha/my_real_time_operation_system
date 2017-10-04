@@ -28,13 +28,19 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
+void clean(void * param)
+{
+	flag1 = 1;
+}
+
+
 void task1_func()
 {
 	tSetSysTickPeriod(10);
 	
 	for (; ;) {
 		
-		ls_task_suspend(&task1);
+//		ls_task_suspend(&task1);
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
@@ -53,49 +59,59 @@ void delay()
 void task2_func()
 {
 
+	uint32_t deleted = 0;
 	for (; ;) {
-
+	
 		
 		flag2 = 1;
-//		ls_delayms(2);
-		delay();
-		flag2 = 0;
-//		ls_delayms(2);
-		delay();
-//		ls_delayms(1);
+		ls_delayms(2);
 
+		flag2 = 0;
+		ls_delayms(2);
+
+		/* 强制删除任务1 */
+		if (!deleted) {
+			deleted = 1;
+			ls_task_set_clean_callback(&task1, clean, 0);
+			ls_task_force_delete(&task1);
+		}
 	}
-	
 }
 
 void task3_func()
 {
 
-	ls_task_resume(&task1);
+//	ls_task_resume(&task1);
 	for (; ;) {
-//		delay();
-		flag3 = 1;
-//		ls_delayms(2);
-		delay();
-		flag3 = 0;
-//		ls_delayms(2);
-		delay();
-//		ls_delayms(1);
 
+		flag3 = 1;
+		ls_delayms(2);
+		flag3 = 0;
+		ls_delayms(2);
+		
+		if (ls_check_task_request_flag(current_task)) {
+			ls_task_delete_self(current_task);
+		}
 	}
-	
 }
 
 void task4_func()
 {
 
+	uint32_t request = 0;
 	for (; ;) {
 
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;
 		ls_delayms(2);
-
+		
+		/* 请求删除任务3 */
+		if (!request) {
+			request = 1;
+			
+			ls_task_request_delete(&task3);
+		}
 	}
 	
 }

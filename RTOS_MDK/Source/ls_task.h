@@ -33,11 +33,17 @@ typedef struct __ls_task {
 	/** \brief 任务时间片节点 */
 	ls_node_t task_time_slice_node;
 	
-//	/** \brief 记录当系统任务的当前任务节点 */
-//	ls_node_t task_myself_node;
-	
 	/** \brief 记录任务的挂起的数量 */
 	uint32_t ls_task_suspend_count;
+	
+	/** \brief 任务删除函数 */
+	void (*clean) (void*);
+	
+	/** \breif 任务删除函数的参数 */
+	void *clean_param;
+	
+	/** \brief 请求删除标志 */
+	uint32_t request_delete_flag;
 	
 }ls_task_t;
 
@@ -47,10 +53,15 @@ extern ls_task_t *next_task;
 
 extern ls_list_t task_table[LS_TASK_COUNT];
 
-///**< \brief 记录当前系统中存在的任务 */
-//extern ls_list_t ls_rtos_task_list;
-
-
+/*
+ *	\brief 初始化任务
+ *  \prame[in]  p_task       ：任务的实体指针
+ *  \prame[in]  p_task_stack : 任务堆栈
+ *  \prame[in]  prio         ：任务优先级
+ *  \prame[in]  func_entry   : 任务的入口函数
+ *  \prame[in]  p_param      : 任务入口函数的参数
+ *  \ret   none
+ */
 void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
 
 /*
@@ -104,17 +115,45 @@ void ls_task_sched_init (void);
  */
 uint32_t ls_get_rtos_task_count (void);
 
-///*
-// *	\brief 初始化系统任务统计链表
-// *  \prame[in]  none
-// *  \ret   none
-// */
-//void ls_rtos_task_list_init (void);
-
-
+/*
+ *	\brief 挂起任务
+ *  \prame[in]  p_task  ：任务实体指针
+ *  \ret   LS_INCORRECT_STA 当前任务处于延时状态
+ *         LS_OK    挂起成功
+ */
 ls_error_t ls_task_suspend(ls_task_t* p_task);
 
+/*
+ *	\brief 恢复任务
+ *  \prame[in]  p_task  ：任务实体指针
+ *  \ret   none
+ */
 void ls_task_resume(ls_task_t* p_task);
+
+
+/*
+ *	\brief 强制删除
+ */
+void ls_task_force_delete(ls_task_t *p_task);
+
+/*
+ *	\brief 请求删除
+ */
+void ls_task_request_delete(ls_task_t *p_task);
+/*
+ *	\brief 判断是否有请求删除标志
+ */
+uint32_t ls_check_task_request_flag(ls_task_t *p_task);
+
+/*
+ * \brief 删除自己
+ */
+void ls_task_delete_self (ls_task_t *p_task);
+
+/*
+ *	\brief 设置清理函数的回调函数
+ */
+void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void *p_clean_param);
 
 #endif
 

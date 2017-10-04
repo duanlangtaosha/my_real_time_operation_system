@@ -49,7 +49,17 @@ void ls_task_timer_weakup(ls_task_t *p_task)
 	p_task->task_state &= ~LS_TASK_DELAY;
 }
 
+/*
+ *	从延时队列中移除
+ */
+void ls_task_time_remove(ls_task_t *p_task)
+{
+	ls_task_enter_critical();
 
+	ls_list_remove_node(&g_delay_list, &p_task->task_delay_node);
+
+	ls_task_exit_critical();
+}
 
 void ls_delayms(uint32_t systick)
 {
@@ -76,37 +86,6 @@ void SysTick_Handler ()
 	
 		/* 进入临界区 */
 		ls_task_enter_critical();
-	
-	
-//			rtos_task_myself_node = ls_list_first_node(&ls_rtos_task_list);
-
-		
-//		/* 当前系统中总共有多少个优先级被挂起 */
-//		for (count = ls_rtos_task_list.node_count ; count > 0; count--) {
-//		
-//			/* 获取出优先级所在的任务 */
-//			ls_task_t *temp_task  = LS_GET_PARENT_STRUCT_ADDR(rtos_task_myself_node, ls_task_t, task_myself_node); 
-//			
-//			/* 获取某个优先级下，该任务链表中的首个任务 */
-//			temp_node = ls_list_first_node(&task_table[temp_task->task_pro]);
-//			
-//			/* 获取出任务链表中的当前处于首个节点的任务 */
-//			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
-
-//			if (--temp_task->task_slice == 0) {
-
-//				temp_task->task_slice = TASK_TIME_SLICE_MAX;
-
-//				/* 移除当前优先级任务链表中的首节点 */
-//				temp_node = ls_list_remove_first(&task_table[temp_task->task_pro]);
-
-//				/* 把移除的节点添加到当前优先级链表的末尾 */
-//				ls_list_insert_node_last(&task_table[temp_task->task_pro], &temp_task->task_time_slice_node);
-//			}
-//			rtos_task_myself_node = rtos_task_myself_node->next_node;
-//		}
-	
-	
 	
 		/* 获取出延时表中的第一个延时节点  */
 		temp_node = ls_list_first_node(&g_delay_list);
