@@ -130,6 +130,9 @@ uint32_t ls_event_remove_all (ls_event_t *p_event, void* p_msg, uint32_t result)
 		p_task->event_result = result;
 		p_task->task_state &= ~LS_TASK_WAIT_MASK;
 		
+		if (p_task->task_delay_ticks != 0) {
+			ls_task_timer_weakup(p_task);
+		}
 		/* 从事件等待队列中移除后，要恢复到就绪队列中 */
 		ls_task_sched_rdy(p_task);
 	}

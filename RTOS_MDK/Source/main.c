@@ -38,10 +38,10 @@ void task1_func()
 	
 	/* 信号量初始化为空,最大信号量为10 */
 	ls_sem_init(&sem, 0, 10);
-	
+	ls_sem_take(&sem, 50);
 	for (; ;) {
 		
-		ls_sem_take(&sem, 50);
+		
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
@@ -78,16 +78,22 @@ void task3_func()
 	}
 }
 
+ls_sem_info_t info;
 void task4_func()
 {
 
-	uint32_t error = 0;
+	uint32_t deled = 0;
 	
 	for (; ;) {
 
-		ls_sem_give(&sem);
+		if (!deled) {
+			deled = 1;
+			ls_sem_get_info(&sem, &info);
+			ls_sem_delete(&sem);
+			ls_sem_get_info(&sem, &info);
+		}
 		
-		error = ls_sem_take_no_wait(&sem);
+//		error = ls_sem_take_no_wait(&sem);
 		
 		flag4 = 1;
 		ls_delayms(2);
