@@ -21,5 +21,7 @@
 
 #include "ls_sem.h"
 
+#include "ls_mbox.h"
+
 #endif
 

@@ -9,6 +9,7 @@ typedef int ls_error_t;
 
 
 #define LS_INCORRECT_STA  (2)			/**< \brief 状态值不正确 */
+#define LS_MBOX_FULL      (3)     /**< \brief 邮箱满  */
 
 #endif
 

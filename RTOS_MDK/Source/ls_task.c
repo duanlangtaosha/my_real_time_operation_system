@@ -78,6 +78,9 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, vo
 	/* 请求删除标志位清0 */
 	p_task->request_delete_flag = 0;
 	
+	/* 事件消息出事化为空 */
+	p_task->event_msg = (void*)0;
+	
 }
 
 

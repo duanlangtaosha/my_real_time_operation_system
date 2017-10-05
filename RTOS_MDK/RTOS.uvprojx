@@ -423,6 +423,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_sem.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_mbox.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_mbox.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

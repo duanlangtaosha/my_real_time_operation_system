@@ -23,7 +23,13 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_sem_t sem;
+ls_mbox_t mbox1;
+ls_mbox_t mbox2;
+void *mbox1_buffer[20];
+void *mbox2_buffer[20];
+
+uint32_t testmsg[20];
+
 
 void clean(void * param)
 {
@@ -36,16 +42,26 @@ void task1_func()
 {
 	tSetSysTickPeriod(10);
 	
-	/* 信号量初始化为空,最大信号量为10 */
-	ls_sem_init(&sem, 0, 10);
-	ls_sem_take(&sem, 50);
+	ls_mbox_init(&mbox1, mbox1_buffer, 20);
+	ls_mbox_init(&mbox2, mbox2_buffer, 20);
+	
 	for (; ;) {
 		
+		uint32_t i = 0;
 		
+		for (i = 0; i < 20; i++) {
+			testmsg[i] = i;
+			ls_mbox_send_msg(&mbox1, &testmsg[i], LS_MSG_NORMAL);
+		}
+		ls_delayms(100);
+		for (i = 0; i < 20; i++) {
+			ls_mbox_send_msg(&mbox1, &testmsg[i], LS_MSG_URGENCY);
+		}
+		ls_delayms(100);
 		flag1 = 1;
-		ls_delayms(2);
+		ls_delayms(1);
 		flag1 = 0;
-		ls_delayms(2);
+		ls_delayms(1);
 		
 	}
 }
@@ -58,12 +74,18 @@ void delay()
 void task2_func()
 {
 	for (; ;) {
+		void *msg;
+		
+		uint32_t error = 0;
 	
-		flag2 = 1;
-		ls_delayms(2);
+		error = ls_mbox_recieve_msg(&mbox1, &msg, 5);
+		
+		if (error == LS_OK) {
 
-		flag2 = 0;
-		ls_delayms(2);
+				flag2 = *(uint32_t *)msg;
+			ls_delayms(1);
+		}
+		
 	}
 }
 
@@ -82,18 +104,8 @@ ls_sem_info_t info;
 void task4_func()
 {
 
-	uint32_t deled = 0;
-	
 	for (; ;) {
 
-		if (!deled) {
-			deled = 1;
-			ls_sem_get_info(&sem, &info);
-			ls_sem_delete(&sem);
-			ls_sem_get_info(&sem, &info);
-		}
-		
-//		error = ls_sem_take_no_wait(&sem);
 		
 		flag4 = 1;
 		ls_delayms(2);

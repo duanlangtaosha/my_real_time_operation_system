@@ -1,6 +1,9 @@
 #ifndef __LS_TASK_H
 #define __LS_TASK_H
 
+#include "stdint.h"
+#include "ls_list.h"
+#include "ls_error.h"
 
 /** \brief RTOS支持的最大的任务的数量 */
 #define LS_TASK_COUNT      32
