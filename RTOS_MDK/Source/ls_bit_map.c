@@ -1,6 +1,5 @@
-#include "ARMCM3.h"
-#include "rtos.h"
-#include "lib.h"
+
+#include "ls_rtos.h"
 
 
 ls_bitmap g_bit_map;

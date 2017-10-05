@@ -1,12 +1,7 @@
 #ifndef __LS_LIST_H
 #define __LS_LIST_H
 
-#include "stdint.h"
-
-
-
-
-
+//#include "stdint.h"
 
 
 #define LS_LIST_FIRST_NODE  head_node.next_node

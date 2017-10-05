@@ -1,9 +1,4 @@
 #include "ls_rtos.h"
-#include "ls_event.h"
-#include "ls_task.h"
-#include "ls_timer.h"
-
-#include "rtos.h"
 
 /*
  *	\brief 初始化任务等待事件

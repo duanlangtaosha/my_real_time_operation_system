@@ -1,8 +1,7 @@
 #ifndef __LS_EVENT_H
 #define __LS_EVENT_H
 
-//#include "ls_list.h"
-#include "ls_task.h"
+#include "ls_rtos.h"
 
 
 typedef enum __ls_event_error {

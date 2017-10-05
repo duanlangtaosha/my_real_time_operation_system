@@ -1,11 +1,5 @@
-#include "ARMCM3.h"
-#include "rtos.h"
-#include "lib.h"
-#include "ls_list.h"
-#include "ls_timer.h"
-#include "ls_task.h"
+
 #include "ls_rtos.h"
-#include "ls_event.h"
 
 extern ls_bitmap g_bit_map;
 

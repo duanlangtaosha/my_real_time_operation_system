@@ -1,7 +1,5 @@
-#include "ARMCM3.h"
-#include "rtos.h"
-#include "lib.h"
-#include "ls_list.h"
+
+#include "ls_rtos.h"
 
 /*
  *	\brief ≥ı ºªØ¡¥±Ì

@@ -1,6 +1,5 @@
-#include "ARMCM3.h"
-#include "rtos.h"
-#include "ls_task.h"
+
+#include "ls_rtos.h"
 
 __asm void PendSV_Handler () {
 
