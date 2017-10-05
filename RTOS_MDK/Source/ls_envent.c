@@ -90,5 +90,55 @@ void ls_event_rmove_task (ls_task_t * p_task, void * p_msg, uint32_t result)
 	ls_task_exit_critical();
 }
 
+/*
+ *	\brief 获取当前事件块队列中的任务数量
+ */
+uint32_t ls_event_wait_count(ls_event_t *p_event)
+{
+	uint32_t count = 0;
+	ls_task_enter_critical();
+	
+	count = ls_list_get_node_count(&p_event->event_list);  
+	
+	ls_task_exit_critical();
+	
+	return count;
+}
+
+/*
+ *	\brief 从事件控制块中移除所有的事件
+ *  \ret  返回移除事件的数量
+ */
+uint32_t ls_event_remove_all (ls_event_t *p_event, void* p_msg, uint32_t result)
+{
+	uint32_t count = 0;
+	
+	ls_node_t *p_node = (ls_node_t*)0;
+	
+	ls_task_t *p_task = (ls_task_t*)0;
+	
+	ls_task_enter_critical();
+	
+	count = ls_list_get_node_count(&p_event->event_list);
+	
+	while ((p_node = ls_list_remove_first(&p_event->event_list)) != (ls_node_t*)0) {
+		
+		p_task = LS_GET_PARENT_STRUCT_ADDR(p_node, ls_task_t, task_time_slice_node);
+		
+		p_task->event = (ls_event_t*)0;
+		p_task->event_msg = p_msg;
+		p_task->event_result = result;
+		p_task->task_state &= ~LS_TASK_WAIT_MASK;
+		
+		/* 从事件等待队列中移除后，要恢复到就绪队列中 */
+		ls_task_sched_rdy(p_task);
+	}
+	
+	ls_task_exit_critical();
+	
+	return count;
+}
+
+
 
 

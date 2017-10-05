@@ -41,7 +41,13 @@ void task1_func()
 	
 	for (; ;) {
 		
-		ls_event_wait(current_task, &event_timeout, 0, 0, 5);
+		uint32_t count = ls_event_wait_count(&event_nomal);
+		
+		if (count > 0) {
+			ls_event_remove_all(&event_nomal, (void*)0, 0);
+		}
+		count = ls_event_wait_count(&event_nomal);
+
 		ls_task_schedule();
 		flag1 = 1;
 		ls_delayms(2);
@@ -74,7 +80,7 @@ void task3_func()
 {
 	for (; ;) {
 
-//		ls_event_wakeup(&event_timeout, (void*)0, 0);
+		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
 		ls_task_schedule();
 		flag3 = 1;
 		ls_delayms(2);
@@ -89,7 +95,7 @@ void task4_func()
 //	uint32_t request = 0;
 	for (; ;) {
 
-		ls_event_wakeup(&event_nomal, (void*)0, 0);
+		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
 		ls_task_schedule();
 		flag4 = 1;
 		ls_delayms(2);
@@ -124,7 +130,7 @@ int main(){
 	
 	ls_task_init(&task3, &task3_stack[1024], 1, task3_func, (void*)0x33333333);
 	
-	ls_task_init(&task4, &task4_stack[1024], 0, task4_func, (void*)0x44444444);
+	ls_task_init(&task4, &task4_stack[1024], 1, task4_func, (void*)0x44444444);
 
 	ls_task_init(&task_idle, &task_idle_stack[1024], 31, task_idle_func, (void*)0x22222222);
 	

@@ -1,7 +1,7 @@
 #ifndef __LS_EVENT_H
 #define __LS_EVENT_H
 
-#include "ls_rtos.h"
+//#include "ls_rtos.h"
 
 
 typedef enum __ls_event_error {
@@ -44,6 +44,16 @@ ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result);
  */
 void ls_event_rmove_task (ls_task_t * p_task, void * p_msg, uint32_t result);
 
+/*
+ *	\brief 获取当前事件块队列中的任务数量
+ */
+uint32_t ls_event_wait_count(ls_event_t *p_event);
+
+/*
+ *	\brief 从事件控制块中移除所有的事件
+ *  \ret  返回移除事件的数量
+ */
+uint32_t ls_event_remove_all (ls_event_t *p_event, void* p_msg, uint32_t result);
 
 
 
