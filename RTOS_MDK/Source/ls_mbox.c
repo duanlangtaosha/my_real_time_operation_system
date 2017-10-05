@@ -144,3 +144,40 @@ ls_error_t ls_mbox_recieve_msg_nowait(ls_mbox_t *p_mbox, void** msg)
 	}
 }
 
+/*
+ *	\brief 清空邮箱
+ */
+void ls_mbox_flush (ls_mbox_t *p_mbox)
+{
+	ls_task_enter_critical();
+	
+	/* 如果没有任务等待，则邮箱已可能不为空，如果有任务等待则邮箱为空 */
+	if ( ls_event_wait_count(&p_mbox->event) == 0) {
+		p_mbox->msg_count = 0;
+		p_mbox->read_index = 0;
+		p_mbox->write_index = 0;
+	}
+	
+	ls_task_exit_critical();
+}
+
+/*
+ *	\brief 删除邮箱
+ */
+uint32_t ls_mbox_delete (ls_mbox_t *p_mbox)
+{
+	uint32_t count = 0;
+	ls_task_enter_critical();
+	
+	count = ls_event_remove_all(&p_mbox->event, (void *)0, event_no_error);
+	
+	ls_task_exit_critical();
+	/* 如果存在释放的任务，就执行一下任务调度 */
+	if (count) {
+		ls_task_schedule();
+	}
+	
+	return count;
+}
+
+

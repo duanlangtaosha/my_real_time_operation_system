@@ -42,5 +42,16 @@ ls_error_t ls_mbox_recieve_msg(ls_mbox_t *p_mbox, void** msg, uint32_t timeout);
  */
 ls_error_t ls_mbox_recieve_msg_nowait(ls_mbox_t *p_mbox, void** msg);
 
+/*
+ *	\brief «Âø’” œ‰
+ */
+void ls_mbox_flush (ls_mbox_t *p_mbox);
+
+/*
+ *	\brief …æ≥˝” œ‰
+ */
+uint32_t ls_mbox_delete (ls_mbox_t *p_mbox);
+
+
 #endif
 

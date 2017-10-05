@@ -40,24 +40,16 @@ ls_task_info_t task_info;
 
 void task1_func()
 {
+	void *p_msg;
 	tSetSysTickPeriod(10);
 	
 	ls_mbox_init(&mbox1, mbox1_buffer, 20);
 	ls_mbox_init(&mbox2, mbox2_buffer, 20);
 	
+	ls_mbox_recieve_msg(&mbox1, &p_msg, 0);
+	
 	for (; ;) {
 		
-		uint32_t i = 0;
-		
-		for (i = 0; i < 20; i++) {
-			testmsg[i] = i;
-			ls_mbox_send_msg(&mbox1, &testmsg[i], LS_MSG_NORMAL);
-		}
-		ls_delayms(100);
-		for (i = 0; i < 20; i++) {
-			ls_mbox_send_msg(&mbox1, &testmsg[i], LS_MSG_URGENCY);
-		}
-		ls_delayms(100);
 		flag1 = 1;
 		ls_delayms(1);
 		flag1 = 0;
@@ -74,17 +66,19 @@ void delay()
 void task2_func()
 {
 	for (; ;) {
-		void *msg;
 		
-		uint32_t error = 0;
+		uint32_t error = 0, i;
 	
-		error = ls_mbox_recieve_msg(&mbox1, &msg, 5);
-		
-		if (error == LS_OK) {
-
-				flag2 = *(uint32_t *)msg;
-			ls_delayms(1);
+		for (i = 0; i < 20 ; i++) {
+			
+			testmsg[i] = i;
+		  ls_mbox_send_msg(&mbox2, &testmsg[i], LS_MSG_NORMAL);
 		}
+		
+	  flag2 = 1;
+		ls_delayms(2);
+		flag2 = 0;
+		ls_delayms(2);
 		
 	}
 }
@@ -93,6 +87,14 @@ void task3_func()
 {
 	for (; ;) {
 
+		void *msg;
+		uint32_t temp = 0;
+		ls_mbox_recieve_msg(&mbox2, &msg, 0);
+		
+		temp = *(uint32_t *)msg;
+		
+		ls_mbox_flush (&mbox2);
+		
 		flag3 = 1;
 		ls_delayms(2);
 		flag3 = 0;
@@ -103,9 +105,10 @@ void task3_func()
 ls_sem_info_t info;
 void task4_func()
 {
-
+	uint32_t count = 0;
 	for (; ;) {
 
+		count = ls_mbox_delete(&mbox1);
 		
 		flag4 = 1;
 		ls_delayms(2);
