@@ -21,6 +21,13 @@ typedef struct __ls_mbox {
 	uint32_t msg_max_count;
 }ls_mbox_t;
 
+typedef struct __ls_mbox_info {
+
+	uint32_t msg_count;
+	uint32_t max_msg_count;
+	uint32_t task_count;
+}ls_mbox_info_t;
+
 /*
  *	\brief ³õÊ¼»¯ÓÊÏä
  */
@@ -51,6 +58,11 @@ void ls_mbox_flush (ls_mbox_t *p_mbox);
  *	\brief É¾³ıÓÊÏä
  */
 uint32_t ls_mbox_delete (ls_mbox_t *p_mbox);
+
+/*
+ *	\brief ÓÊÏäµÄ×´Ì¬²éÑ¯
+ */
+void ls_mbox_get_info (ls_mbox_t *p_mbox, ls_mbox_info_t *info);
 
 
 #endif

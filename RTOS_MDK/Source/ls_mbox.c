@@ -180,4 +180,17 @@ uint32_t ls_mbox_delete (ls_mbox_t *p_mbox)
 	return count;
 }
 
+/*
+ *	\brief ÓÊÏäµÄ×´Ì¬²éÑ¯
+ */
+void ls_mbox_get_info (ls_mbox_t *p_mbox, ls_mbox_info_t *info)
+{
+	ls_task_enter_critical();
+	
+	info->msg_count = p_mbox->msg_count;
+	info->max_msg_count = p_mbox->msg_max_count;
+	info->task_count = ls_event_wait_count(&p_mbox->event);
+	
+	ls_task_exit_critical();
+}
 

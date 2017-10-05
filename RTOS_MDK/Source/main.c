@@ -25,6 +25,7 @@ int flag5  = 0;
 
 ls_mbox_t mbox1;
 ls_mbox_t mbox2;
+ls_mbox_info_t mbox2_info;
 void *mbox1_buffer[20];
 void *mbox2_buffer[20];
 
@@ -88,12 +89,17 @@ void task3_func()
 	for (; ;) {
 
 		void *msg;
+		
 		uint32_t temp = 0;
 		ls_mbox_recieve_msg(&mbox2, &msg, 0);
 		
 		temp = *(uint32_t *)msg;
 		
+		ls_mbox_get_info(&mbox2, &mbox2_info);
+		
 		ls_mbox_flush (&mbox2);
+		
+		ls_mbox_get_info(&mbox2, &mbox2_info);
 		
 		flag3 = 1;
 		ls_delayms(2);
