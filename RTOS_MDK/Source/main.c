@@ -23,8 +23,7 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_event_t event_timeout;
-ls_event_t event_nomal;
+ls_sem_t sem;
 
 void clean(void * param)
 {
@@ -36,19 +35,13 @@ ls_task_info_t task_info;
 void task1_func()
 {
 	tSetSysTickPeriod(10);
-	ls_event_init(&event_nomal, event_type_no);
-	ls_event_init(&event_timeout, event_type_no);
+	
+	/* 信号量初始化为空,最大信号量为10 */
+	ls_sem_init(&sem, 0, 10);
 	
 	for (; ;) {
 		
-		uint32_t count = ls_event_wait_count(&event_nomal);
-		
-		if (count > 0) {
-			ls_event_remove_all(&event_nomal, (void*)0, 0);
-		}
-		count = ls_event_wait_count(&event_nomal);
-
-		ls_task_schedule();
+		ls_sem_take(&sem, 50);
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
@@ -66,8 +59,6 @@ void task2_func()
 {
 	for (; ;) {
 	
-		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
-		ls_task_schedule();
 		flag2 = 1;
 		ls_delayms(2);
 
@@ -80,8 +71,6 @@ void task3_func()
 {
 	for (; ;) {
 
-		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
-		ls_task_schedule();
 		flag3 = 1;
 		ls_delayms(2);
 		flag3 = 0;
@@ -92,11 +81,14 @@ void task3_func()
 void task4_func()
 {
 
-//	uint32_t request = 0;
+	uint32_t error = 0;
+	
 	for (; ;) {
 
-		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
-		ls_task_schedule();
+		ls_sem_give(&sem);
+		
+		error = ls_sem_take_no_wait(&sem);
+		
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;

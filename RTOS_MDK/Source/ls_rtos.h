@@ -19,7 +19,7 @@
 
 #include "ls_event.h"
 
-
+#include "ls_sem.h"
 
 #endif
 
