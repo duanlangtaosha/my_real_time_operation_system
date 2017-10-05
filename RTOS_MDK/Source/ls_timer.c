@@ -5,6 +5,7 @@
 #include "ls_timer.h"
 #include "ls_task.h"
 #include "ls_rtos.h"
+#include "ls_event.h"
 
 extern ls_bitmap g_bit_map;
 
@@ -97,8 +98,11 @@ void SysTick_Handler ()
 			
 			if (--(temp_task->task_delay_ticks) == 0 ) {
 			
-//				/* 如果任务延时时间到了, 就从延时表中移除 */
-//				ls_list_remove_first(&g_delay_list);
+				if (temp_task->event) {
+				
+					/* 产生一个超时错误 */
+					ls_event_rmove_task(temp_task, 0, event_timeout_error);
+				}
 				
 				/* 从延时状态中唤醒 */
 				ls_task_timer_weakup(temp_task);

@@ -4,6 +4,7 @@
 #include "ls_list.h"
 #include "ls_timer.h"
 #include "ls_task.h"
+#include "ls_event.h"
 
 
 extern ls_bitmap g_bit_map;
@@ -28,6 +29,9 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
+ls_event_t event_timeout;
+ls_event_t event_nomal;
+
 void clean(void * param)
 {
 	flag1 = 1;
@@ -38,11 +42,13 @@ ls_task_info_t task_info;
 void task1_func()
 {
 	tSetSysTickPeriod(10);
+	ls_event_init(&event_nomal, event_type_no);
+	ls_event_init(&event_timeout, event_type_no);
 	
 	for (; ;) {
 		
-		ls_task_suspend(&task1);
-//		ls_task_get_info(&task1, &task_info);
+		ls_event_wait(current_task, &event_timeout, 0, 0, 5);
+		ls_task_schedule();
 		flag1 = 1;
 		ls_delayms(2);
 		flag1 = 0;
@@ -51,8 +57,6 @@ void task1_func()
 	}
 }
 
-uint32_t test_public_varaible = 0;
-
 void delay()
 {
 	uint32_t i = 0xFFFF;
@@ -60,61 +64,44 @@ void delay()
 }
 void task2_func()
 {
-
-	uint32_t deleted = 0;
 	for (; ;) {
 	
-		
+		ls_event_wait(current_task, &event_nomal, 0, 0, 0);
+		ls_task_schedule();
 		flag2 = 1;
 		ls_delayms(2);
 
 		flag2 = 0;
 		ls_delayms(2);
-
-		/* 强制删除任务1 */
-		if (!deleted) {
-			deleted = 1;
-			ls_task_set_clean_callback(&task1, clean, 0);
-			ls_task_force_delete(&task1);
-		}
 	}
 }
 
 void task3_func()
 {
-	ls_task_get_info(&task1, &task_info);
-	ls_task_resume(&task1);
-	ls_task_get_info(&task1, &task_info);
 	for (; ;) {
 
+//		ls_event_wakeup(&event_timeout, (void*)0, 0);
+		ls_task_schedule();
 		flag3 = 1;
 		ls_delayms(2);
 		flag3 = 0;
 		ls_delayms(2);
-		
-		if (ls_check_task_request_flag(current_task)) {
-			ls_task_delete_self(current_task);
-		}
 	}
 }
 
 void task4_func()
 {
 
-	uint32_t request = 0;
+//	uint32_t request = 0;
 	for (; ;) {
 
+		ls_event_wakeup(&event_nomal, (void*)0, 0);
+		ls_task_schedule();
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;
 		ls_delayms(2);
 		
-		/* 请求删除任务3 */
-		if (!request) {
-			request = 1;
-			
-			ls_task_request_delete(&task3);
-		}
 	}
 	
 }
@@ -144,7 +131,7 @@ int main(){
 	ls_task_init(&task3, &task3_stack[1024], 1, task3_func, (void*)0x33333333);
 	
 	ls_task_init(&task4, &task4_stack[1024], 0, task4_func, (void*)0x44444444);
-//	
+
 	ls_task_init(&task_idle, &task_idle_stack[1024], 31, task_idle_func, (void*)0x22222222);
 	
 	next_task = ls_task_high_redy();

@@ -131,14 +131,14 @@ void ls_task_schedule_enable (void)
  */
 void ls_task_sched_rdy(ls_task_t *p_task)
 {
-	ls_task_enter_critical();
+//	ls_task_enter_critical();
 	
 	/* 把节点重新加入任务优先级的链表 */
 	ls_list_insert_node_last(&task_table[p_task->task_pro], &p_task->task_time_slice_node);
 	
 	ls_bitmap_set(&g_bit_map, p_task->task_pro);
 	
-	ls_task_exit_critical();
+//	ls_task_exit_critical();
 }
 
 
@@ -147,7 +147,7 @@ void ls_task_sched_rdy(ls_task_t *p_task)
  */
 void ls_task_sched_unrdy(ls_task_t *p_task)
 {
-	ls_task_enter_critical();
+//	ls_task_enter_critical();
 	
 	ls_list_remove_node(&task_table[p_task->task_pro], &p_task->task_time_slice_node);
 	
@@ -156,7 +156,7 @@ void ls_task_sched_unrdy(ls_task_t *p_task)
 		ls_bitmap_clr(&g_bit_map, p_task->task_pro);
 	}
 	
-	ls_task_exit_critical();
+//	ls_task_exit_critical();
 }
 
 /*

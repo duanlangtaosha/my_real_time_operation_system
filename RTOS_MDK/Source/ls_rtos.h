@@ -3,6 +3,9 @@
 
 #include "stdint.h"
 
+//#include "ls_task.h"
+//#include "ls_list.h"
+
 /** \brief RTOS支持的最大的任务的数量 */
 #define LS_TASK_COUNT      32
 

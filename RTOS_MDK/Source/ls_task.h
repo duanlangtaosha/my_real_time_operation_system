@@ -5,10 +5,14 @@
 #include "ls_rtos.h"
 #include "stdint.h"
 #include "ls_error.h"
+//#include "ls_event.h"
 
 #define LS_TASK_RDY			(1 << 0)
 #define LS_TASK_DELAY   (1 << 1)
 #define LS_TASK_SUSPEND (1 << 2)
+#define LS_TASK_WAIT_MASK                   (0xFF << 16)
+
+struct __ls_event;
 
 typedef struct __ls_task {
 
@@ -44,6 +48,15 @@ typedef struct __ls_task {
 	
 	/** \brief 请求删除标志 */
 	uint32_t request_delete_flag;
+	
+	/** \brief 事件 */
+	struct __ls_event *event;
+	
+	/** \brief 事件返回的结果 */
+	uint32_t event_result;
+	
+	/** \brief 事件消息 */
+	void *event_msg;
 	
 }ls_task_t;
 
@@ -169,5 +182,10 @@ void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void 
  *	\brief 获取任务的状态
  */
 void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info);
+
+/*
+ *	从就绪表中移除
+ */
+void ls_task_sched_remove(ls_task_t *p_task);
 #endif
 
