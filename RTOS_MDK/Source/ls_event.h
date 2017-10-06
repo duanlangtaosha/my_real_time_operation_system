@@ -17,6 +17,7 @@ typedef enum __ls_event_type {
 	event_type_no,
 	ls_event_type_sem,
 	ls_event_type_msg,
+	ls_event_type_mem_block,
 
 }ls_event_type_t;
 

@@ -428,6 +428,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_mbox.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_mem_block.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_mem_block.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

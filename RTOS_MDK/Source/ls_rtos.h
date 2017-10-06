@@ -23,5 +23,7 @@
 
 #include "ls_mbox.h"
 
+#include "ls_mem_block.h"
+
 #endif
 

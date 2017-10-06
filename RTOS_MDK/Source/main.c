@@ -1,4 +1,5 @@
 #include "ls_rtos.h"
+#include "string.h"
 
 
 extern ls_bitmap g_bit_map;
@@ -23,14 +24,13 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_mbox_t mbox1;
-ls_mbox_t mbox2;
-ls_mbox_info_t mbox2_info;
-void *mbox1_buffer[20];
-void *mbox2_buffer[20];
+ls_mem_block_t mem_block1;
+ls_mem_block_t mem_block2;
 
-uint32_t testmsg[20];
+uint8_t mem1[20][100];
+uint8_t mem1[20][100];
 
+typedef uint8_t (*mem_block)[100];
 
 void clean(void * param)
 {
@@ -39,17 +39,37 @@ void clean(void * param)
 
 ls_task_info_t task_info;
 
+uint32_t temp = 0;
 void task1_func()
 {
-	void *p_msg;
+	mem_block block[20];
+	uint32_t i;
+	
+	extern void tSetSysTickPeriod(uint32_t ms);
+	
 	tSetSysTickPeriod(10);
 	
-	ls_mbox_init(&mbox1, mbox1_buffer, 20);
-	ls_mbox_init(&mbox2, mbox2_buffer, 20);
 	
-	ls_mbox_recieve_msg(&mbox1, &p_msg, 0);
 	
+	ls_mem_block_init(&mem_block1, mem1, 100, 20);
+	
+			
+	for (i = 0; i < 20; i++) {
+		ls_mem_block_take(&mem_block1, (void **)&block[i], 0);
+	}
+	
+	ls_delayms(2);
+	
+	for (i = 0; i < 20; i++) {
+		memset(block[i], i, 100);
+		ls_mem_block_give(&mem_block1, (uint8_t *)block[i]);
+		
+		/* 要想看的阶梯则这个延时是必须的 */
+		ls_delayms(2);
+	}
 	for (; ;) {
+
+		
 		
 		flag1 = 1;
 		ls_delayms(1);
@@ -68,18 +88,13 @@ void task2_func()
 {
 	for (; ;) {
 		
-		uint32_t error = 0, i;
-	
-		for (i = 0; i < 20 ; i++) {
-			
-			testmsg[i] = i;
-		  ls_mbox_send_msg(&mbox2, &testmsg[i], LS_MSG_NORMAL);
-		}
+		mem_block block;
 		
-	  flag2 = 1;
-		ls_delayms(2);
-		flag2 = 0;
-		ls_delayms(2);
+		temp = (uint32_t)block;
+		ls_mem_block_take(&mem_block1, (void **)&block, 0);
+		temp = (uint32_t)block;
+		
+		flag2 = *(uint8_t*)block;
 		
 	}
 }
@@ -88,19 +103,6 @@ void task3_func()
 {
 	for (; ;) {
 
-		void *msg;
-		
-		uint32_t temp = 0;
-		ls_mbox_recieve_msg(&mbox2, &msg, 0);
-		
-		temp = *(uint32_t *)msg;
-		
-		ls_mbox_get_info(&mbox2, &mbox2_info);
-		
-		ls_mbox_flush (&mbox2);
-		
-		ls_mbox_get_info(&mbox2, &mbox2_info);
-		
 		flag3 = 1;
 		ls_delayms(2);
 		flag3 = 0;
@@ -108,14 +110,10 @@ void task3_func()
 	}
 }
 
-ls_sem_info_t info;
 void task4_func()
 {
-	uint32_t count = 0;
 	for (; ;) {
 
-		count = ls_mbox_delete(&mbox1);
-		
 		flag4 = 1;
 		ls_delayms(2);
 		flag4 = 0;

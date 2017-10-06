@@ -1,7 +1,6 @@
 #include "ls_rtos.h"
 #include "ls_mbox.h"
 
-uint32_t temp = 0;
 
 /*
  *	\brief 初始化邮箱
@@ -66,7 +65,6 @@ ls_error_t ls_mbox_send_msg (ls_mbox_t *p_mbox, void* p_msg, uint32_t send_optio
 			
 		} else {  /* 消息普通 */
 			
-				temp = (uint32_t)&p_mbox->buffer[p_mbox->write_index];
 				p_mbox->buffer[p_mbox->write_index++] = p_msg;
 			
 				if (p_mbox->write_index >= p_mbox->msg_max_count) {
@@ -91,7 +89,6 @@ ls_error_t ls_mbox_recieve_msg(ls_mbox_t *p_mbox, void** msg, uint32_t timeout)
 	
 	if (p_mbox->msg_count) {
 		
-		temp = (uint32_t)&p_mbox->buffer[p_mbox->read_index];
 		/* 如果消息缓存区有消息，则读出消息 */
 		*msg = p_mbox->buffer[p_mbox->read_index++];
 		
