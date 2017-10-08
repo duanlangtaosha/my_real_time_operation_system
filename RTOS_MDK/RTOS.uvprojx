@@ -433,6 +433,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_mem_block.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_mutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_mutex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

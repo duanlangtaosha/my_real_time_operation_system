@@ -15,6 +15,7 @@
 #define LS_TASK_RDY			(1 << 0)
 #define LS_TASK_DELAY   (1 << 1)
 #define LS_TASK_SUSPEND (1 << 2)
+#define LS_OWNER_ERROR  (1 << 3)
 #define LS_TASK_WAIT_MASK                   (0xFF << 16)
 
 struct __ls_event;

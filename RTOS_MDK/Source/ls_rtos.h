@@ -25,5 +25,7 @@
 
 #include "ls_mem_block.h"
 
+#include "ls_mutex.h"
+
 #endif
 

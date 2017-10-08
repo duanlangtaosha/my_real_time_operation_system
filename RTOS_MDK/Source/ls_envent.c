@@ -23,9 +23,7 @@ void ls_event_wait (ls_task_t *p_task, ls_event_t *p_event, void *p_msg, uint32_
 	p_task->event_result = event_no_error;
 	
 	/* 从就绪表中移除 */
-//	ls_task_sched_remove(p_task);
 	ls_task_sched_unrdy(p_task);
-	
 	
 	/* 插入等待事件表中 */
 	ls_list_insert_node_last(&p_event->event_list, &p_task->task_time_slice_node);
@@ -55,7 +53,9 @@ ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result)
 	if (temp_node != (ls_node_t*)0) {
 		task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node);
 
-		task->event = p_event;
+//		task->event = p_event;
+		/* 唤醒后的任务事件指针清0 */
+		task->event = (ls_event_t*)0;
 		task->event_msg = p_msg;
 		task->task_state &= ~LS_TASK_WAIT_MASK;
 		task->event_result = event_no_error;
@@ -67,7 +67,6 @@ ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result)
 		ls_task_sched_rdy(task);
 	}
 
-	
 	ls_task_exit_critical();
 
 	return task;

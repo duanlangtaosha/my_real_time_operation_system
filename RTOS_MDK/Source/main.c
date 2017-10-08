@@ -24,58 +24,29 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_mem_block_t mem_block1;
-ls_mem_block_t mem_block2;
+ls_mutex_t mutex;
 
-uint8_t mem1[20][100];
-uint8_t mem1[20][100];
-
-typedef uint8_t (*mem_block)[100];
-
-void clean(void * param)
-{
-	flag1 = 1;
-}
-
-ls_task_info_t task_info;
 
 uint32_t temp = 0;
 void task1_func()
 {
-	mem_block block[20];
-	uint32_t i;
 	
 	extern void tSetSysTickPeriod(uint32_t ms);
 	
 	tSetSysTickPeriod(10);
+	ls_mutex_init(&mutex);
 	
 	
-	
-	ls_mem_block_init(&mem_block1, mem1, 100, 20);
-	
-			
-	for (i = 0; i < 20; i++) {
-		ls_mem_block_take(&mem_block1, (void **)&block[i], 0);
-	}
-	
-	ls_delayms(2);
-	
-	for (i = 0; i < 20; i++) {
-		memset(block[i], i, 100);
-		ls_mem_block_give(&mem_block1, (uint8_t *)block[i]);
-		
-		/* 要想看的阶梯则这个延时是必须的 */
-		ls_delayms(2);
-	}
 	for (; ;) {
 
-		
-		
+		ls_mutex_take(&mutex, 0);
+		ls_mutex_take(&mutex, 0);
 		flag1 = 1;
 		ls_delayms(1);
 		flag1 = 0;
 		ls_delayms(1);
-		
+		ls_mutex_give(&mutex);
+		ls_mutex_give(&mutex);
 	}
 }
 
@@ -88,14 +59,14 @@ void task2_func()
 {
 	for (; ;) {
 		
-		mem_block block;
-		
-		temp = (uint32_t)block;
-		ls_mem_block_take(&mem_block1, (void **)&block, 0);
-		temp = (uint32_t)block;
-		
-		flag2 = *(uint8_t*)block;
-		
+		ls_mutex_take(&mutex, 0);
+		ls_mutex_take(&mutex, 0);
+		flag2 = 1;
+		ls_delayms(2);
+		flag2 = 0;
+		ls_delayms(2);
+		ls_mutex_give(&mutex);
+		ls_mutex_give(&mutex);
 	}
 }
 
@@ -118,9 +89,7 @@ void task4_func()
 		ls_delayms(2);
 		flag4 = 0;
 		ls_delayms(2);
-		
 	}
-	
 }
 
 
