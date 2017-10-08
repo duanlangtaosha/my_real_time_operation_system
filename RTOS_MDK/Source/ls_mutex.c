@@ -131,3 +131,65 @@ ls_error_t ls_mutex_give (ls_mutex_t *p_mutex)
 	
 //	ls_task_exit_critical();
 }
+
+/*
+ *	\brief 删除信号量
+ */
+uint32_t ls_mutex_delete (ls_mutex_t *p_mutex)
+{
+	
+	uint32_t count = 0;
+	ls_task_enter_critical();
+	
+	/* 如果有任务锁定 */
+	if (p_mutex->lock_count > 0) {
+		
+		/* 如果发生了优先级继承 */
+		if (p_mutex->origin_prio != p_mutex->owner_task->task_pro) {
+			
+			if (p_mutex->owner_task->task_state == LS_TASK_RDY) {
+			
+					ls_task_sched_unrdy(p_mutex->owner_task);
+				
+					p_mutex->owner_task->task_pro = p_mutex->origin_prio;
+					ls_task_sched_rdy(p_mutex->owner_task);
+			}else {
+				p_mutex->owner_task->task_pro = p_mutex->origin_prio;
+			}
+		}
+	}
+	
+	count = ls_event_remove_all(&p_mutex->event, (void*)0, event_no_error);
+	
+	if (count > 0) {
+		ls_task_schedule();
+	}
+	
+	ls_task_exit_critical();
+	
+	return count;
+}
+
+/*
+ *	\brief 获取当前互斥信号量的信息 
+ */
+void ls_mutex_get_info (ls_mutex_t *p_mutex, ls_mutex_info_t *info)
+{
+	
+	ls_task_enter_critical();
+	
+	info->lock_count = p_mutex->lock_count;
+	info->task_count = ls_event_wait_count(&p_mutex->event);
+	info->owner_prio = p_mutex->owner_task->task_pro;
+	
+	if (p_mutex->origin_prio != p_mutex->owner_task->task_pro) {
+		info->inherited_prio = p_mutex->owner_task->task_pro;
+	}else {
+		info->inherited_prio = LS_TASK_COUNT;
+	}
+	
+	info->owner_task = p_mutex->owner_task;
+	
+	ls_task_exit_critical();
+}
+

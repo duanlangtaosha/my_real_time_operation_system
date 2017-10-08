@@ -25,6 +25,7 @@ int flag4  = 0;
 int flag5  = 0;
 
 ls_mutex_t mutex;
+ls_mutex_info_t mutex_info;
 
 
 uint32_t temp = 0;
@@ -36,17 +37,24 @@ void task1_func()
 	tSetSysTickPeriod(10);
 	ls_mutex_init(&mutex);
 	
+	ls_mutex_take(&mutex, 0);
+	ls_mutex_get_info(&mutex, &mutex_info);
+	
+	ls_mutex_delete(&mutex);
+	ls_mutex_get_info(&mutex, &mutex_info);
+	
+	
 	
 	for (; ;) {
 
-		ls_mutex_take(&mutex, 0);
-		ls_mutex_take(&mutex, 0);
+//		ls_mutex_take(&mutex, 0);
+//		ls_mutex_take(&mutex, 0);
 		flag1 = 1;
 		ls_delayms(1);
 		flag1 = 0;
 		ls_delayms(1);
-		ls_mutex_give(&mutex);
-		ls_mutex_give(&mutex);
+//		ls_mutex_give(&mutex);
+//		ls_mutex_give(&mutex);
 	}
 }
 
@@ -59,14 +67,14 @@ void task2_func()
 {
 	for (; ;) {
 		
-		ls_mutex_take(&mutex, 0);
-		ls_mutex_take(&mutex, 0);
+//		ls_mutex_take(&mutex, 0);
+//		ls_mutex_take(&mutex, 0);
 		flag2 = 1;
 		ls_delayms(2);
 		flag2 = 0;
 		ls_delayms(2);
-		ls_mutex_give(&mutex);
-		ls_mutex_give(&mutex);
+//		ls_mutex_give(&mutex);
+//		ls_mutex_give(&mutex);
 	}
 }
 
