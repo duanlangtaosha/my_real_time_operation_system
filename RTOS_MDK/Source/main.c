@@ -28,6 +28,8 @@ ls_timer_t timer0;
 ls_timer_t timer1;
 ls_timer_t timer2;
 
+ls_timer_info_t timer1_info;
+
 uint32_t bit0 = 0;
 uint32_t bit1 = 0;
 uint32_t bit2 = 0;
@@ -60,8 +62,10 @@ void task1_func()
 		ls_delayms(100);
 		if (timer_stop == 0) {
 			timer_stop = 1;
-			ls_timer_stop(&timer0);
+			ls_timer_delete(&timer0);
 		}
+		
+		ls_timer_get_info(&timer1, &timer1_info);
 		
 		flag1 = 1;
 		ls_delayms(1);

@@ -34,6 +34,18 @@ typedef struct __ls_timer {
 	
 }ls_timer_t;
 
+typedef struct __ls_timer_info {
+
+	uint32_t start_delay_ticks;
+	uint32_t duration_delay_ticks;
+	uint32_t delay_ticks;
+	timer_callback_t timer_callback;
+	void* timer_callback_param;
+	uint32_t config;
+	ls_timer_state_t state;
+	
+}ls_timer_info_t;
+
 /* 初始化定时器 */
 void ls_timer_init (ls_timer_t *p_timer,
 										uint32_t start_delay_ticks,
@@ -54,6 +66,12 @@ void systick_handle_timer_deal(void);
 
 /* 定时器模块的初始化 */
 void ls_timer_module_init (void);
+
+/* 获取定时器的当前信息 */										
+void ls_timer_get_info(ls_timer_t *p_timer, ls_timer_info_t *p_info);
+										
+/* 删除定时器 */
+void ls_timer_delete(ls_timer_t *p_timer);
 
 #endif
 

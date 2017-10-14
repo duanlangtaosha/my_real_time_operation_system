@@ -161,3 +161,25 @@ void ls_timer_module_init ()
 	ls_task_exit_critical();
 }
 
+
+void ls_timer_get_info(ls_timer_t *p_timer, ls_timer_info_t *p_info)
+{
+	ls_task_enter_critical();
+	
+	p_info->start_delay_ticks = p_timer->start_delay_ticks;
+	p_info->duration_delay_ticks = p_timer->duration_delay_ticks;
+	p_info->delay_ticks = p_timer->delay_ticks;
+	p_info->timer_callback = p_timer->timer_callback;
+	p_info->timer_callback_param = p_timer->timer_callback_param;
+	p_info->config = p_timer->config;
+	p_info->state = p_timer->state;
+	
+	ls_task_exit_critical();
+}
+
+void ls_timer_delete(ls_timer_t *p_timer)
+{
+	ls_timer_stop(p_timer);
+	
+	p_timer->state = LS_TIMER_DELETED;
+}
