@@ -1,135 +1,163 @@
-
 #include "ls_rtos.h"
+#include "ls_timer.h"
 
-extern ls_bitmap g_bit_map;
+static ls_list_t timer_hard_list;
+static ls_list_t timer_soft_list;
 
-ls_list_t    g_delay_list;
+static ls_sem_t systick_handle_sem;
+static ls_sem_t timer_protect_sem;
 
-void tSetSysTickPeriod(uint32_t ms)
+void ls_timer_init (ls_timer_t *p_timer,
+										uint32_t start_delay_ticks,
+										uint32_t duration_delay_ticks,
+										timer_callback_t callback,
+										void *callback_param,
+										uint32_t config)
 {
-  SysTick->LOAD  = ms * SystemCoreClock / 1000 - 1; 
-  NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);
-  SysTick->VAL   = 0;                           
-  SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
-                   SysTick_CTRL_TICKINT_Msk   |
-                   SysTick_CTRL_ENABLE_Msk; 
+	
+	ls_node_init(&p_timer->link_node);
+	
+	p_timer->start_delay_ticks = start_delay_ticks;
+	p_timer->duration_delay_ticks = duration_delay_ticks;
+	p_timer->timer_callback = callback;
+	p_timer->timer_callback_param = callback_param;
+	p_timer->config = config;
+	
+	p_timer->state = LS_TIMER_CREATED;
+	
+	p_timer->delay_ticks = ((start_delay_ticks > 0) ? start_delay_ticks : duration_delay_ticks);
 }
 
-void ls_init_delay_list (void)
+void ls_timer_start (ls_timer_t *p_timer)
 {
-
-	ls_list_init(&g_delay_list);
-
-}
-
-/*
- *	\brief 任务进入等待状态
- */
-void ls_task_timer_wait(ls_task_t *p_task, uint32_t delay_ticks)
-{
-//	ls_list_insert_node_first(&g_delay_list, &p_task->task_delay_node);
-	ls_list_insert_node_last(&g_delay_list, &p_task->task_delay_node);
-	p_task->task_delay_ticks = delay_ticks;
-	p_task->task_state |= LS_TASK_DELAY;
-
-}
-
-/*
- *	\brief 任务被从等待态中唤醒 
- */
-void ls_task_timer_weakup(ls_task_t *p_task)
-{
-
-	ls_list_remove_node(&g_delay_list, &p_task->task_delay_node);
-	p_task->task_state &= ~LS_TASK_DELAY;
-}
-
-/*
- *	从延时队列中移除
- */
-void ls_task_time_remove(ls_task_t *p_task)
-{
-	ls_task_enter_critical();
-
-	ls_list_remove_node(&g_delay_list, &p_task->task_delay_node);
-
-	ls_task_exit_critical();
-}
-
-void ls_delayms(uint32_t systick)
-{
-	ls_task_enter_critical();
-	
-	ls_task_timer_wait(current_task, systick);
-	
-	ls_task_sched_unrdy(current_task);
-	
-	ls_task_exit_critical();
-	
-	ls_task_schedule();
-}
-
-extern ls_task_t	 task1;
-extern ls_task_t	 task2;
-void SysTick_Handler () 
-{
-
-		ls_node_t *temp_node ;
-//		ls_node_t *rtos_task_myself_node;
-	
-		uint32_t count = 0;
-	
-		/* 进入临界区 */
-		ls_task_enter_critical();
-	
-		/* 获取出延时表中的第一个延时节点  */
-		temp_node = ls_list_first_node(&g_delay_list);
+	switch (p_timer->state) {
+		case LS_TIMER_CREATED:
+		case LS_TIMER_STOP:
+			p_timer->delay_ticks = (p_timer->start_delay_ticks > 0) ? p_timer->start_delay_ticks 
+																															: p_timer->duration_delay_ticks ;
 		
-		for (count = g_delay_list.node_count; count !=0; count--) {
-			
-			/* 通过延时任务节点，反推出当前任务 */
-			ls_task_t *temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_delay_node);
-			
-			if (--(temp_task->task_delay_ticks) == 0 ) {
-			
-				if (temp_task->event) {
-				
-					/* 产生一个超时错误 */
-					ls_event_rmove_task(temp_task, 0, event_timeout_error);
-				}
-				
-				/* 从延时状态中唤醒 */
-				ls_task_timer_weakup(temp_task);
-				ls_task_sched_rdy(temp_task);
-				
+			p_timer->state = LS_TIMER_STARTED;
+		
+			if (p_timer->config == LS_TIMER_HARD) {
+				ls_task_enter_critical();
+				ls_list_insert_node_last(&timer_hard_list, &p_timer->link_node);
+				ls_task_exit_critical();
+		 } else if (p_timer->config == LS_TIMER_SOFT) {
+				ls_sem_take(&timer_protect_sem, 0);
+				ls_list_insert_node_last(&timer_soft_list, &p_timer->link_node);
+				ls_sem_give(&timer_protect_sem);
+		 }
+			break;
+		default:
+			break;
+	
+	}
+}
+
+void ls_timer_stop (ls_timer_t *p_timer)
+{
+	switch (p_timer->state) {
+		case LS_TIMER_STARTED:
+		case LS_TIMER_RUNING:
+			if (p_timer->config == LS_TIMER_HARD) {
+				ls_task_enter_critical();
+				ls_list_remove_node(&timer_hard_list, &p_timer->link_node);
+				ls_task_exit_critical();
+			} else if(p_timer->config == LS_TIMER_SOFT){
+				ls_sem_take(&timer_protect_sem, 0);
+				ls_list_remove_node(&timer_soft_list, &p_timer->link_node);
+				ls_sem_give(&timer_protect_sem);
 			}
-			temp_node = temp_node->next_node;
-		}
-		
-		
-		if (--(current_task->task_slice) == 0) {
-		
-			current_task->task_slice = TASK_TIME_SLICE_MAX;
 			
-//			/* 获取某个优先级下，该任务链表中的首个任务 */
-//			temp_node = ls_list_first_node(&task_table[current_task->task_pro]);
-//			
-//			/* 获取出任务链表中的当前处于首个节点的任务 */
-//			temp_task = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_task_t, task_time_slice_node); 
-			
-			  /* 移除当前优先级任务链表中的首节点 */
-				temp_node = ls_list_remove_first(&task_table[current_task->task_pro]);
+		break;
+		default:
+			break;
+	}
+}
 
-				/* 把移除的节点添加到当前优先级链表的末尾 */
-				ls_list_insert_node_last(&task_table[current_task->task_pro], temp_node);
-		}
+static void timer_callback_deal(ls_list_t *p_list)
+{
+	ls_node_t *temp_node;
+	ls_timer_t *timer;
+	for (temp_node = ls_list_first_node(p_list); 
+			temp_node !=&p_list->head_node; 
+			temp_node = temp_node->next_node ) {
+				
+				timer = LS_GET_PARENT_STRUCT_ADDR(temp_node, ls_timer_t, link_node);
+				
+				if ((timer->delay_ticks == 0) || (--timer->delay_ticks == 0)) {
+					
+					timer->state = LS_TIMER_RUNING;
+					
+					timer->timer_callback(timer->timer_callback_param);
+					
+					timer->state = LS_TIMER_STARTED;
+					
+					if (timer->duration_delay_ticks == 0) {
+//						ls_sem_take(&timer_protect_sem, 0);
+//						
+//						ls_timer_stop(timer);
+//						
+//						ls_sem_give(&timer_protect_sem);
+						
+						ls_list_remove_node(p_list, &timer->link_node);
+						
+						timer->state = LS_TIMER_STOP;
+						
+					} else {
+						timer->delay_ticks = timer->duration_delay_ticks;
+					}
+					
+				}
+	}
 
+}
+
+static void soft_timer_task()
+{
+	for (;;) {
 		
+		ls_sem_take(&systick_handle_sem, 0);
+		ls_sem_take(&timer_protect_sem, 0);
 		
-		/* 退出临界区 */
-		ls_task_exit_critical();
+		timer_callback_deal(&timer_soft_list);
 		
-		/* 执行任务调度 */
-    ls_task_schedule();
+		ls_sem_give(&timer_protect_sem);
+	}
+}
+
+void systick_handle_timer_deal()
+{
+	ls_task_enter_critical();
+	
+	timer_callback_deal(&timer_hard_list);
+	
+	ls_task_exit_critical();
+	
+	ls_sem_give(&systick_handle_sem);
+}
+
+static ls_task_t task_timer;
+static ls_stack_t task_stack[LS_TIMER_TASK_STACK];
+
+
+void ls_timer_module_init ()
+{
+	ls_task_enter_critical();
+	ls_list_init(&timer_hard_list);
+	ls_list_init(&timer_soft_list);
+	
+	/* 初始化为有一个信号量，最多也只有一个  */
+	ls_sem_init(&timer_protect_sem, 1, 1);
+	
+	/* 初始化为0个信号量，最多有0xffffffff个信号量 */
+	ls_sem_init(&systick_handle_sem, 0, 0);
+	
+#if (LS_TIMER_TASK_PRIORITY >= LS_TASK_COUNT - 1)
+#error the timer task priority must grater than (LS_TASK_COUNT - 1)!
+#endif
+	ls_task_init(&task_timer, task_stack, LS_TIMER_TASK_PRIORITY, soft_timer_task, (void*)0);
+	
+	ls_task_exit_critical();
 }
 

@@ -132,12 +132,12 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <Capability>1</Capability>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -394,11 +394,6 @@
               <FilePath>.\Source\ls_task.c</FilePath>
             </File>
             <File>
-              <FileName>ls_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Source\ls_timer.c</FilePath>
-            </File>
-            <File>
               <FileName>app.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\app.c</FilePath>
@@ -437,6 +432,16 @@
               <FileName>ls_mutex.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\ls_mutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>ls_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>ls_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_timer.c</FilePath>
             </File>
           </Files>
         </Group>

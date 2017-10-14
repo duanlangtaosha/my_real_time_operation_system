@@ -24,37 +24,49 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_mutex_t mutex;
-ls_mutex_info_t mutex_info;
+ls_timer_t timer0;
+ls_timer_t timer1;
+ls_timer_t timer2;
 
+uint32_t bit0 = 0;
+uint32_t bit1 = 0;
+uint32_t bit2 = 0;
 
-uint32_t temp = 0;
+void timer_callback (void *param)
+{
+	uint32_t* temp = param;
+	
+	*temp ^= 0x01;
+}
 void task1_func()
 {
 	
+	
 	extern void tSetSysTickPeriod(uint32_t ms);
-	
+	uint32_t timer_stop = 0;
 	tSetSysTickPeriod(10);
-	ls_mutex_init(&mutex);
-	
-	ls_mutex_take(&mutex, 0);
-	ls_mutex_get_info(&mutex, &mutex_info);
-	
-	ls_mutex_delete(&mutex);
-	ls_mutex_get_info(&mutex, &mutex_info);
+
+	ls_timer_init(&timer0, 10, 10, timer_callback, (void*)&bit0, LS_TIMER_HARD);
+	ls_timer_start (&timer0);
+	ls_timer_init(&timer1, 10, 20, timer_callback, (void*)&bit1, LS_TIMER_SOFT);
+	ls_timer_start(&timer1);
+	ls_timer_init(&timer2, 30, 0, timer_callback, (void*)&bit2, LS_TIMER_HARD);
+	ls_timer_start(&timer2);
 	
 	
 	
 	for (; ;) {
-
-//		ls_mutex_take(&mutex, 0);
-//		ls_mutex_take(&mutex, 0);
+		
+		ls_delayms(100);
+		if (timer_stop == 0) {
+			timer_stop = 1;
+			ls_timer_stop(&timer0);
+		}
+		
 		flag1 = 1;
 		ls_delayms(1);
 		flag1 = 0;
 		ls_delayms(1);
-//		ls_mutex_give(&mutex);
-//		ls_mutex_give(&mutex);
 	}
 }
 
@@ -63,18 +75,20 @@ void delay()
 	uint32_t i = 0xFFFF;
 	while(i--);
 }
+
+
+
 void task2_func()
 {
 	for (; ;) {
 		
-//		ls_mutex_take(&mutex, 0);
-//		ls_mutex_take(&mutex, 0);
+		
 		flag2 = 1;
 		ls_delayms(2);
 		flag2 = 0;
 		ls_delayms(2);
-//		ls_mutex_give(&mutex);
-//		ls_mutex_give(&mutex);
+
+		
 	}
 }
 
@@ -113,6 +127,7 @@ int test = 0;
 
 int main(){
 	
+	ls_timer_module_init ();
 	/* 初始化任务调度 */
 	ls_task_sched_init();
 	
