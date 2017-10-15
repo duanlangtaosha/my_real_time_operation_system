@@ -159,7 +159,7 @@ void ls_timer_module_init ()
 #if (LS_TIMER_TASK_PRIORITY >= LS_TASK_COUNT - 1)
 #error the timer task priority must grater than (LS_TASK_COUNT - 1)!
 #endif
-	ls_task_init(&task_timer, task_stack, LS_TIMER_TASK_PRIORITY, soft_timer_task, (void*)0);
+	ls_task_init(&task_timer, task_stack, sizeof(task_stack), LS_TIMER_TASK_PRIORITY, soft_timer_task, (void*)0);
 	
 	ls_task_exit_critical();
 }

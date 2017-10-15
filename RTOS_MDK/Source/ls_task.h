@@ -25,6 +25,12 @@ typedef struct __ls_task {
 	/** \brief 任务的堆栈指针 */
 	uint32_t *p_stack;
 	
+	/** \brief 堆栈的起始地址（数组的开始位置） */
+	uint32_t *stack_base;
+	
+	/** \brief 堆栈的大小 */
+	uint32_t stack_size;
+	
 	/** \brief 任务的延时tick数  */
 	uint32_t  task_delay_ticks;
 	
@@ -75,6 +81,10 @@ typedef struct __ls_task {
 
 typedef struct __ls_task_info {
 	uint32_t task_pro;
+	uint32_t stack_size;
+	
+	/* 空闲的的栈 */
+	uint32_t stack_free;
 	uint32_t task_state;
 	uint32_t task_delay_ticks;
 	uint32_t task_suspend_count;
@@ -97,7 +107,11 @@ extern ls_list_t task_table[LS_TASK_COUNT];
  *  \prame[in]  p_param      : 任务入口函数的参数
  *  \ret   none
  */
-void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
+//void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param);
+/*
+ *	任务初始化
+ */
+void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint32_t stack_size, uint8_t prio, void* func_entry, void *p_param);
 
 /*
  *	\brief 获取当前就绪表中最高优先级的任务

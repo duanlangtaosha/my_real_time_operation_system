@@ -25,28 +25,31 @@ extern ls_bitmap g_bit_map;
 /*
  *	任务初始化
  */
-void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint8_t prio, void* func_entry, void *p_param)
+void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint32_t stack_size, uint8_t prio, void* func_entry, void *p_param)
 {
-	
-	*(--p_task_stack) = (uint32_t)(1 << 24);
-	*(--p_task_stack) = (uint32_t)func_entry;
-	*(--p_task_stack) = (uint32_t)14;		     /* R14(LR)*/
-	*(--p_task_stack) = (uint32_t)12;		     /* R14 */
-	*(--p_task_stack) = (uint32_t)3;         /* R3 */
-	*(--p_task_stack) = (uint32_t)2;         /* R2 */
-	*(--p_task_stack) = (uint32_t)1;         /* R1 */
-	*(--p_task_stack) = (uint32_t)p_param;   /* R0 */
-	*(--p_task_stack) = (uint32_t)11;        /* R11 */
-	*(--p_task_stack) = (uint32_t)10;        /* R10 */
-	*(--p_task_stack) = (uint32_t)9;         /* R9 */
-	*(--p_task_stack) = (uint32_t)8;         /* R8 */
-	*(--p_task_stack) = (uint32_t)7;         /* R7 */
-	*(--p_task_stack) = (uint32_t)6;         /* R6 */
-	*(--p_task_stack) = (uint32_t)5;         /* R5 */
-	*(--p_task_stack) = (uint32_t)4;         /* R4 */
+	ls_stack_t *stack_top;
+	p_task->stack_base = p_task_stack;
+	p_task->stack_size = stack_size;
+	stack_top = p_task_stack + stack_size / sizeof(ls_stack_t);
+	*(--stack_top) = (uint32_t)(1 << 24);
+	*(--stack_top) = (uint32_t)func_entry;
+	*(--stack_top) = (uint32_t)14;		     /* R14(LR)*/
+	*(--stack_top) = (uint32_t)12;		     /* R14 */
+	*(--stack_top) = (uint32_t)3;         /* R3 */
+	*(--stack_top) = (uint32_t)2;         /* R2 */
+	*(--stack_top) = (uint32_t)1;         /* R1 */
+	*(--stack_top) = (uint32_t)p_param;   /* R0 */
+	*(--stack_top) = (uint32_t)11;        /* R11 */
+	*(--stack_top) = (uint32_t)10;        /* R10 */
+	*(--stack_top) = (uint32_t)9;         /* R9 */
+	*(--stack_top) = (uint32_t)8;         /* R8 */
+	*(--stack_top) = (uint32_t)7;         /* R7 */
+	*(--stack_top) = (uint32_t)6;         /* R6 */
+	*(--stack_top) = (uint32_t)5;         /* R5 */
+	*(--stack_top) = (uint32_t)4;         /* R4 */
 	
 	p_task->task_pro = prio;
-	p_task->p_stack = p_task_stack;
+	p_task->p_stack = stack_top;
 	p_task->task_delay_ticks = 0;
 
 	ls_bitmap_set(&g_bit_map, prio);
@@ -331,6 +334,7 @@ void ls_task_set_clean_callback(ls_task_t *p_task, void (*p_clean)(void*), void 
  */
 void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info)
 {
+	ls_stack_t *stack_top;
 	ls_task_enter_critical();
 	
 	p_info->task_pro = p_task->task_pro;
@@ -338,7 +342,15 @@ void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info)
 	p_info->task_slice = p_task->task_slice;
 	p_info->task_delay_ticks = p_task->task_delay_ticks;
 	p_info->task_suspend_count = p_task->ls_task_suspend_count;
+	p_info->stack_size = p_task->stack_size;
 	
+	p_info->stack_free = 0;
+	stack_top = p_task->stack_base;
+	while ((*stack_top++ == 0) && stack_top <= p_task->stack_base + p_task->stack_size / sizeof(ls_stack_t)) {
+		p_info->stack_free++;
+	}
+	
+	p_info->stack_free *= sizeof(ls_stack_t);
 	ls_task_exit_critical();
 }
 
