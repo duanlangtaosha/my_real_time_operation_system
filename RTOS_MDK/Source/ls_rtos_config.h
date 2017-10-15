@@ -17,13 +17,14 @@
 *			ÄÚºË²Ã¼ô
 *******************************************************************************************/
 
-#define LS_ENABLE_SEM            (1)
-#define LS_ENABLE_MUTEX					 (1)
-#define LS_ENABLE_FLAG_GROUP     (1)
-#define LS_ENABLE_MEM_BLOCK      (1)
-#define LS_ENABLE_TIMER          (1)
-#define LS_ENABLE_MBOX           (1)
-#define LS_ENABLE_CPU_USAGE      (1)
+#define LS_ENABLE_SEM            (0)
+#define LS_ENABLE_MUTEX					 (0)
+#define LS_ENABLE_FLAG_GROUP     (0)
+#define LS_ENABLE_MEM_BLOCK      (0)
+#define LS_ENABLE_TIMER          (0)
+#define LS_ENABLE_MBOX           (0)
+#define LS_ENABLE_CPU_USAGE      (0)
+#define LS_ENABLE_HOOKS          (1)
 
 #endif
 

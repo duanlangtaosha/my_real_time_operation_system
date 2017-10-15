@@ -33,6 +33,8 @@
 
 #include "ls_timer.h"
 
+#include "ls_hooks.h"
+
 void ls_rtos_init(void);
 
 #define LS_RTOS_SYSTICK_PERIOD      10

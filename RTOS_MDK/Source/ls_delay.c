@@ -134,6 +134,10 @@ void SysTick_Handler ()
 		ls_cpu_usage_check();
 #endif
 		
+#if (LS_ENABLE_HOOKS == 1)
+		ls_systick_handle_hooks();
+#endif 
+		
 		/* ÍË³öÁÙ½çÇø */
 		ls_task_exit_critical();
 

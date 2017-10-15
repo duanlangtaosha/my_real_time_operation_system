@@ -448,6 +448,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_flag_group.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_hooks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_hooks.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

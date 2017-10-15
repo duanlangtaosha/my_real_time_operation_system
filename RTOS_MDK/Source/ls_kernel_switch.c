@@ -111,8 +111,13 @@ void ls_task_schedule(void)
 	if (temp_task != current_task) {
 	
 		next_task = temp_task;
+		
+#if (LS_ENABLE_HOOKS == 1)
+		ls_task_switch_hooks(current_task, next_task);
+#endif
+			ls_task_witch ();
 	}
 
-	ls_task_witch ();
+
 	ls_task_exit_critical();
 }

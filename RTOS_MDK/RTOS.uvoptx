@@ -171,7 +171,7 @@
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>376</LineNumber>
+          <LineNumber>384</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -187,7 +187,7 @@
         <Bp>
           <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>442</LineNumber>
+          <LineNumber>454</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -599,6 +599,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\Source\ls_flag_group.c</PathWithFileName>
       <FilenameWithoutPath>ls_flag_group.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>15</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Source\ls_hooks.c</PathWithFileName>
+      <FilenameWithoutPath>ls_hooks.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

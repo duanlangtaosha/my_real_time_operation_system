@@ -1,5 +1,6 @@
 
 #include "ls_rtos.h"
+#include <string.h>
 
 #if (LS_ENABLE_CPU_USAGE == 1)
  uint32_t idel_count = 0;
@@ -38,6 +39,9 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint32_t stack_s
 	ls_stack_t *stack_top;
 	p_task->stack_base = p_task_stack;
 	p_task->stack_size = stack_size;
+	
+	memset(p_task_stack, 0, stack_size);
+	
 	stack_top = p_task_stack + stack_size / sizeof(ls_stack_t);
 	*(--stack_top) = (uint32_t)(1 << 24);
 	*(--stack_top) = (uint32_t)func_entry;
@@ -91,6 +95,10 @@ void ls_task_init(ls_task_t *p_task, ls_stack_t * p_task_stack, uint32_t stack_s
 	
 	/* 事件消息出事化为空 */
 	p_task->event_msg = (void*)0;
+	
+#if (LS_ENABLE_HOOKS == 1)
+	ls_task_init_hooks(p_task);
+#endif
 	
 }
 
@@ -392,10 +400,14 @@ static void task_idle_func()
 		idel_count++;
 		ls_task_exit_critical();
 #endif
+		
+#if (LS_ENABLE_HOOKS == 1)
+		ls_task_idle_hooks();
+#endif
 	}
 }
 
-	extern void tSetSysTickPeriod(uint32_t ms);
+extern void tSetSysTickPeriod(uint32_t ms);
 
 static ls_stack_t  task_idle_stack[1024];
 static ls_task_t	 task_idle;
