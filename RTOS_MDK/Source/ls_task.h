@@ -5,12 +5,6 @@
 #include "ls_list.h"
 #include "ls_error.h"
 
-/** \brief RTOS支持的最大的任务的数量 */
-#define LS_TASK_COUNT      32
-
-/** \brief 每个任务执行的最大时间片   */
-#define TASK_TIME_SLICE_MAX     10
-
 
 #define LS_TASK_RDY			(1 << 0)
 #define LS_TASK_DELAY   (1 << 1)

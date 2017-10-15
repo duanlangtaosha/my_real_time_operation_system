@@ -2,6 +2,8 @@
 #include "ls_rtos.h"
 #include "ls_mem_block.h"
 
+#if (LS_ENABLE_MEM_BLOCK == 1)
+
 /*
  *	\brief ³õÊ¼»¯ÄÚ´æ¿é
  */
@@ -123,3 +125,7 @@ ls_error_t ls_mem_block_take_nowait (ls_mem_block_t *p_mem_blcok, void** mem, ui
 		
 	}
 }
+
+
+#endif
+

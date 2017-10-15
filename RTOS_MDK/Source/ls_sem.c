@@ -1,5 +1,7 @@
 #include "ls_rtos.h"
 
+#if (LS_ENABLE_SEM == 1)
+
 /*
  *	\brief 初始化信号量
  */
@@ -134,3 +136,5 @@ void ls_sem_delete(ls_sem_t *p_sem)
 		ls_task_schedule();
 	}
 }
+
+#endif

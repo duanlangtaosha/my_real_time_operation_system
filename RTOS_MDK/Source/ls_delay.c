@@ -69,7 +69,7 @@ void ls_delayms(uint32_t systick)
 	ls_task_schedule();
 }
 
-extern void ls_cpu_usage_check ();
+extern void ls_cpu_usage_check (void);
 extern uint32_t idel_count ;
 extern uint32_t idel_count_max ;
 extern uint32_t systick_count ;
@@ -128,15 +128,20 @@ void SysTick_Handler ()
 				ls_list_insert_node_last(&task_table[current_task->task_pro], temp_node);
 		}
 
+#if (LS_ENABLE_CPU_USAGE == 1)
 		systick_count++;
 		
 		ls_cpu_usage_check();
+#endif
 		
 		/* 退出临界区 */
 		ls_task_exit_critical();
-		
+
+
+#if (LS_ENABLE_TIMER == 1)		
 		/* 软件定时器的处理 */
 		systick_handle_timer_deal();
+#endif
 		
 		/* 执行任务调度 */
     ls_task_schedule();

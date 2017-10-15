@@ -37,9 +37,9 @@ void delay()
 }
 void task1_func()
 {
-	float usag = 0.0;
-	
-	ls_flag_group_init(&flag_group, 0x00);
+//	float usag = 0.0;
+//	
+//	ls_flag_group_init(&flag_group, 0x00);
 
 	for (; ;) {
 		
@@ -52,7 +52,7 @@ void task1_func()
 		flag1 = 0;
 		ls_delayms(1);
 		
-		usag = ls_get_cpu_usage();
+//		usag = ls_get_cpu_usage();
 	}
 }
 

@@ -1,6 +1,8 @@
 #include "ls_rtos.h"
 #include "ls_timer.h"
 
+#if (LS_ENABLE_TIMER == 1)
+
 static ls_list_t timer_hard_list;
 static ls_list_t timer_soft_list;
 
@@ -194,3 +196,6 @@ void ls_timer_delete(ls_timer_t *p_timer)
 	
 	p_timer->state = LS_TIMER_DELETED;
 }
+
+#endif
+

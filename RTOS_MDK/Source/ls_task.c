@@ -1,11 +1,14 @@
 
 #include "ls_rtos.h"
+
+#if (LS_ENABLE_CPU_USAGE == 1)
  uint32_t idel_count = 0;
  uint32_t idel_count_max = 0;
  uint32_t systick_count = 0;
  uint32_t first_systick = 0;
  uint32_t start_check_cpu_usage = 0;
 static float cpu_usage = 0.0;
+#endif
 
 
 /**< \brief 任务调度锁，调度次数初始化 */
@@ -358,24 +361,37 @@ void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info)
 	p_info->stack_free *= sizeof(ls_stack_t);
 	ls_task_exit_critical();
 }
+#if (LS_ENABLE_CPU_USAGE == 1)
 static void wait_asys_systick(void);
+#endif
+
 extern void ls_init_app(void);
 int flag5  = 0;
 static void task_idle_func()
 {
+
+#if (LS_ENABLE_TIMER == 1)
+	
 	/* 初始化定时器任务 */
 	ls_timer_task_init();
+#endif
+	
 	ls_init_app();
 	
 	tSetSysTickPeriod(LS_RTOS_SYSTICK_PERIOD);
-	
+
+#if (LS_ENABLE_CPU_USAGE == 1)
 	/* 等待时钟同步 */
 	wait_asys_systick();
+#endif
+	
 	for (; ;) {
 //	flag5 = !flag5;
+#if (LS_ENABLE_CPU_USAGE == 1)
 		ls_task_enter_critical();
 		idel_count++;
 		ls_task_exit_critical();
+#endif
 	}
 }
 
@@ -386,13 +402,16 @@ static ls_task_t	 task_idle;
 
 void ls_rtos_init(void)
 {
+#if (LS_ENABLE_TIMER == 1)
 	ls_timer_module_init ();
+#endif
+	
 	/* 初始化任务调度 */
 	ls_task_sched_init();
 	
 	ls_init_delay_list ();
 	
-	ls_task_init(&task_idle, task_idle_stack, sizeof(task_idle_stack), 31, task_idle_func, (void*)0x22222222);
+	ls_task_init(&task_idle, task_idle_stack, sizeof(task_idle_stack), LS_IDEL_TASK_PRIORITY, task_idle_func, (void*)0x22222222);
 	
 	next_task = ls_task_high_redy();
 
@@ -400,11 +419,7 @@ void ls_rtos_init(void)
 	
 }
 
-//static uint32_t idel_count_max = 0;
-//static uint32_t systick_count = 0;
-//static uint32_t first_systick = 0;
-//static uint32_t start_check_cpu_usage = 0;
-//static float cpu_usage = 0.0;
+#if (LS_ENABLE_CPU_USAGE == 1)
 void ls_cpu_usage_check ()
 {
 	/* 先要同步,当来一个SYSTICK时钟后就同步 */
@@ -443,4 +458,6 @@ float ls_get_cpu_usage()
 	
 	return usage;
 }
+
+#endif
 

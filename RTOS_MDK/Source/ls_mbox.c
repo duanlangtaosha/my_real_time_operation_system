@@ -1,6 +1,7 @@
 #include "ls_rtos.h"
 #include "ls_mbox.h"
 
+#if (LS_ENABLE_MBOX == 1)
 
 /*
  *	\brief ≥ı ºªØ” œ‰
@@ -190,4 +191,7 @@ void ls_mbox_get_info (ls_mbox_t *p_mbox, ls_mbox_info_t *info)
 	
 	ls_task_exit_critical();
 }
+
+
+#endif
 

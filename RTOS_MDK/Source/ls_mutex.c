@@ -1,5 +1,7 @@
 #include "ls_rtos.h"
 
+#if (LS_ENABLE_MUTEX == 1)
+
 void ls_mutex_init (ls_mutex_t *p_mutex)
 {
 	ls_event_init(&p_mutex->event, ls_event_type_mutex);
@@ -193,3 +195,4 @@ void ls_mutex_get_info (ls_mutex_t *p_mutex, ls_mutex_info_t *info)
 	ls_task_exit_critical();
 }
 
+#endif

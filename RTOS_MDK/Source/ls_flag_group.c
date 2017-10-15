@@ -1,6 +1,7 @@
 #include "ls_rtos.h"
 #include "ls_flag_group.h"
 
+#if (LS_ENABLE_FLAG_GROUP == 1)
 
 void ls_flag_group_init(ls_flag_group_t *p_flag_group, uint32_t flag)
 {
@@ -178,4 +179,6 @@ uint32_t ls_flag_group_delete(ls_flag_group_t *p_flag_group)
 	
 	return count;
 }
+
+#endif 
 
