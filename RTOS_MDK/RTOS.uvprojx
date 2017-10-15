@@ -443,6 +443,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ls_timer.c</FilePath>
             </File>
+            <File>
+              <FileName>ls_flag_group.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ls_flag_group.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

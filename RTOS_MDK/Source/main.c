@@ -24,48 +24,19 @@ int flag3  = 0;
 int flag4  = 0;
 int flag5  = 0;
 
-ls_timer_t timer0;
-ls_timer_t timer1;
-ls_timer_t timer2;
+ls_flag_group_t flag_group;
+uint32_t result;
 
-ls_timer_info_t timer1_info;
-
-uint32_t bit0 = 0;
-uint32_t bit1 = 0;
-uint32_t bit2 = 0;
-
-void timer_callback (void *param)
-{
-	uint32_t* temp = param;
-	
-	*temp ^= 0x01;
-}
 void task1_func()
 {
-	
-	
 	extern void tSetSysTickPeriod(uint32_t ms);
-	uint32_t timer_stop = 0;
 	tSetSysTickPeriod(10);
+	
+	ls_flag_group_init(&flag_group, 0x00);
 
-	ls_timer_init(&timer0, 10, 10, timer_callback, (void*)&bit0, LS_TIMER_HARD);
-	ls_timer_start (&timer0);
-	ls_timer_init(&timer1, 10, 20, timer_callback, (void*)&bit1, LS_TIMER_SOFT);
-	ls_timer_start(&timer1);
-	ls_timer_init(&timer2, 30, 0, timer_callback, (void*)&bit2, LS_TIMER_HARD);
-	ls_timer_start(&timer2);
-	
-	
-	
 	for (; ;) {
 		
-		ls_delayms(100);
-		if (timer_stop == 0) {
-			timer_stop = 1;
-			ls_timer_delete(&timer0);
-		}
-		
-		ls_timer_get_info(&timer1, &timer1_info);
+		ls_flag_group_take(&flag_group, LS_FLAG_SET_ALL | LS_FLAG_CONSUME, 0x03, &result, 0);
 		
 		flag1 = 1;
 		ls_delayms(1);
@@ -86,12 +57,13 @@ void task2_func()
 {
 	for (; ;) {
 		
-		
+
 		flag2 = 1;
 		ls_delayms(2);
+	  ls_flag_group_give(&flag_group, LS_FLAG_SET, 0x03);
 		flag2 = 0;
 		ls_delayms(2);
-
+	
 		
 	}
 }

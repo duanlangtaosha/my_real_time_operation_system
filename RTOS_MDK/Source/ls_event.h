@@ -18,6 +18,7 @@ typedef enum __ls_event_type {
 	ls_event_type_sem,
 	ls_event_type_msg,
 	ls_event_type_mem_block,
+	ls_event_type_flag_group,
 	ls_event_type_mutex,
 
 }ls_event_type_t;
@@ -45,6 +46,11 @@ void ls_event_wait (ls_task_t *p_task, ls_event_t *p_event, void *p_msg, uint32_
  *	\brief 将任务从事件等待队列中唤醒
  */
 ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result);
+
+/*
+ *	\brief 将特定的任务从事件等待队列中唤醒
+ */
+ls_task_t *ls_event_wakeup_task(ls_event_t *p_event, ls_task_t *p_task, void *p_msg, uint32_t result);
 
 /*
  *	\brief 将任务从事件等待队列中移除

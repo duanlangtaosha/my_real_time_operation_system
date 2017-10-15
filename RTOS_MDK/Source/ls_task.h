@@ -64,6 +64,12 @@ typedef struct __ls_task {
 	/** \brief 事件消息 */
 	void *event_msg;
 	
+	/** \brief 事件标志组等待类型 */
+	uint32_t flag_group_wait_type;
+	
+	/** \brief 事件标志组等待标志 */
+	uint32_t flag_group_flag;
+	
 }ls_task_t;
 
 

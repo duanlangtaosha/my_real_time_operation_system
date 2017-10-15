@@ -29,6 +29,8 @@
 
 #include "ls_mutex.h"
 
+#include "ls_flag_group.h"
+
 #include "ls_timer.h"
 
 #endif

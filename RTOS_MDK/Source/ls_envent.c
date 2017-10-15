@@ -58,7 +58,7 @@ ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result)
 		task->event = (ls_event_t*)0;
 		task->event_msg = p_msg;
 		task->task_state &= ~LS_TASK_WAIT_MASK;
-		task->event_result = event_no_error;
+		task->event_result = result;
 
 		if (task->task_delay_ticks != 0) {
 			ls_task_timer_weakup(task);
@@ -70,6 +70,32 @@ ls_task_t *ls_event_wakeup(ls_event_t *p_event, void *p_msg, uint32_t result)
 	ls_task_exit_critical();
 
 	return task;
+}
+
+/*
+ *	\brief 将特定的任务从事件等待队列中唤醒
+ */
+ls_task_t *ls_event_wakeup_task(ls_event_t *p_event, ls_task_t *p_task, void *p_msg, uint32_t result)
+{
+	ls_task_enter_critical();
+	
+	ls_list_remove_node(&p_event->event_list, &p_task->task_time_slice_node);
+	
+		/* 唤醒后的任务事件指针清0 */
+		p_task->event = (ls_event_t*)0;
+		p_task->event_msg = p_msg;
+		p_task->task_state &= ~LS_TASK_WAIT_MASK;
+		p_task->event_result = result;
+
+		if (p_task->task_delay_ticks != 0) {
+			ls_task_timer_weakup(p_task);
+		}
+		
+		ls_task_sched_rdy(p_task);
+
+	ls_task_exit_critical();
+
+	return p_task;
 }
 
 /*

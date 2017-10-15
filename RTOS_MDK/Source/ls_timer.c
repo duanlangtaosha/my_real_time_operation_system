@@ -79,7 +79,10 @@ static void timer_callback_deal(ls_list_t *p_list)
 {
 	ls_node_t *temp_node;
 	ls_timer_t *timer;
-	for (temp_node = ls_list_first_node(p_list); 
+//	for (temp_node = ls_list_first_node(p_list); 
+//			temp_node !=&p_list->head_node; 
+//			temp_node = temp_node->next_node ) {
+	for (temp_node = p_list->head_node.next_node; 
 			temp_node !=&p_list->head_node; 
 			temp_node = temp_node->next_node ) {
 				
