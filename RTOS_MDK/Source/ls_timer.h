@@ -73,6 +73,9 @@ void ls_timer_get_info(ls_timer_t *p_timer, ls_timer_info_t *p_info);
 /* 删除定时器 */
 void ls_timer_delete(ls_timer_t *p_timer);
 
+/*初始化定时器任务*/
+void ls_timer_task_init(void);
+
 #endif
 
 

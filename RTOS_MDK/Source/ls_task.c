@@ -1,6 +1,11 @@
 
 #include "ls_rtos.h"
-
+ uint32_t idel_count = 0;
+ uint32_t idel_count_max = 0;
+ uint32_t systick_count = 0;
+ uint32_t first_systick = 0;
+ uint32_t start_check_cpu_usage = 0;
+static float cpu_usage = 0.0;
 
 
 /**< \brief 任务调度锁，调度次数初始化 */
@@ -352,5 +357,90 @@ void ls_task_get_info(ls_task_t *p_task, ls_task_info_t *p_info)
 	
 	p_info->stack_free *= sizeof(ls_stack_t);
 	ls_task_exit_critical();
+}
+static void wait_asys_systick(void);
+extern void ls_init_app(void);
+int flag5  = 0;
+static void task_idle_func()
+{
+	/* 初始化定时器任务 */
+	ls_timer_task_init();
+	ls_init_app();
+	
+	tSetSysTickPeriod(LS_RTOS_SYSTICK_PERIOD);
+	
+	/* 等待时钟同步 */
+	wait_asys_systick();
+	for (; ;) {
+//	flag5 = !flag5;
+		ls_task_enter_critical();
+		idel_count++;
+		ls_task_exit_critical();
+	}
+}
+
+	extern void tSetSysTickPeriod(uint32_t ms);
+
+static ls_stack_t  task_idle_stack[1024];
+static ls_task_t	 task_idle;
+
+void ls_rtos_init(void)
+{
+	ls_timer_module_init ();
+	/* 初始化任务调度 */
+	ls_task_sched_init();
+	
+	ls_init_delay_list ();
+	
+	ls_task_init(&task_idle, task_idle_stack, sizeof(task_idle_stack), 31, task_idle_func, (void*)0x22222222);
+	
+	next_task = ls_task_high_redy();
+
+	ls_first_tast_entry();
+	
+}
+
+//static uint32_t idel_count_max = 0;
+//static uint32_t systick_count = 0;
+//static uint32_t first_systick = 0;
+//static uint32_t start_check_cpu_usage = 0;
+//static float cpu_usage = 0.0;
+void ls_cpu_usage_check ()
+{
+	/* 先要同步,当来一个SYSTICK时钟后就同步 */
+	if (0 == first_systick) {
+		first_systick = 1;
+		start_check_cpu_usage = 1;
+		ls_task_schedule_disable();
+	} 
+	if (systick_count == LS_TICKS_PER_SEC) {
+		/* 这个只执行一次 */
+		static uint32_t flag = 0;
+		
+		if (flag == 0) {
+			flag = 1;
+		  idel_count_max = idel_count ;
+			idel_count = 0;
+			ls_task_schedule_enable();
+		}
+	} else if (systick_count % LS_TICKS_PER_SEC == 0) {
+		cpu_usage = 100 - (100.0 * idel_count) / idel_count_max;
+		idel_count = 0;
+	}
+}
+
+static void wait_asys_systick()
+{
+	while (start_check_cpu_usage == 0) {};
+}
+
+float ls_get_cpu_usage()
+{
+	float usage = 0.0;
+	ls_task_enter_critical();
+	usage = cpu_usage;
+	ls_task_exit_critical();
+	
+	return usage;
 }
 

@@ -33,5 +33,10 @@
 
 #include "ls_timer.h"
 
+void ls_rtos_init(void);
+
+#define LS_RTOS_SYSTICK_PERIOD      10
+#define LS_TICKS_PER_SEC           (1000 / LS_RTOS_SYSTICK_PERIOD)
+
 #endif
 

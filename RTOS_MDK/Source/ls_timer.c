@@ -156,6 +156,14 @@ void ls_timer_module_init ()
 	/* 初始化为0个信号量，最多有0xffffffff个信号量 */
 	ls_sem_init(&systick_handle_sem, 0, 0);
 	
+	ls_task_exit_critical();
+}
+
+/* 初始化定时器的任务 */
+void ls_timer_task_init()
+{
+	
+	ls_task_enter_critical();
 #if (LS_TIMER_TASK_PRIORITY >= LS_TASK_COUNT - 1)
 #error the timer task priority must grater than (LS_TASK_COUNT - 1)!
 #endif

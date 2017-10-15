@@ -69,8 +69,12 @@ void ls_delayms(uint32_t systick)
 	ls_task_schedule();
 }
 
-extern ls_task_t	 task1;
-extern ls_task_t	 task2;
+extern void ls_cpu_usage_check ();
+extern uint32_t idel_count ;
+extern uint32_t idel_count_max ;
+extern uint32_t systick_count ;
+extern  uint32_t first_systick ;
+extern uint32_t start_check_cpu_usage ;
 void SysTick_Handler () 
 {
 
@@ -124,7 +128,9 @@ void SysTick_Handler ()
 				ls_list_insert_node_last(&task_table[current_task->task_pro], temp_node);
 		}
 
+		systick_count++;
 		
+		ls_cpu_usage_check();
 		
 		/* ÍË³öÁÙ½çÇø */
 		ls_task_exit_critical();
