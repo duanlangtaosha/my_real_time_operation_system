@@ -149,4 +149,33 @@ void ls_flag_group_give(ls_flag_group_t *p_flag_group, uint32_t is_set, uint32_t
 	ls_task_exit_critical();
 }
 
+/*
+ *	\brief 获取事件标志组的信息
+ */
+void ls_flag_group_get_info(ls_flag_group_t *p_flag_group, ls_flag_group_info_t *p_flag_group_info)
+{
+	ls_task_enter_critical();
+	
+	p_flag_group_info->flag = p_flag_group->flag;
+	p_flag_group_info->task_count = ls_event_wait_count(&p_flag_group->event);
+	
+	ls_task_exit_critical();
+}
+
+/*
+ *	\brief 删除事件标志组
+ */
+uint32_t ls_flag_group_delete(ls_flag_group_t *p_flag_group)
+{
+	uint32_t count = 0;
+	ls_task_enter_critical();
+	count = ls_event_remove_all(&p_flag_group->event, (void*)0, event_deleted);
+	ls_task_exit_critical();
+	
+	if (count > 0) {
+		ls_task_schedule();
+	}
+	
+	return count;
+}
 

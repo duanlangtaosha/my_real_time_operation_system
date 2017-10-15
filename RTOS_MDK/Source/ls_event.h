@@ -9,7 +9,8 @@
 typedef enum __ls_event_error {
 	event_no_error,
 	event_timeout_error,
-	event_resource_unavailable_error
+	event_resource_unavailable_error,
+	event_deleted
 }ls_event_error_t;
 
 typedef enum __ls_event_type {

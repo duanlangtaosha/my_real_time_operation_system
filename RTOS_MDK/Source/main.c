@@ -26,6 +26,8 @@ int flag5  = 0;
 
 ls_flag_group_t flag_group;
 uint32_t result;
+uint32_t result_inof;
+ls_flag_group_info_t group_info;
 
 void task1_func()
 {
@@ -36,7 +38,8 @@ void task1_func()
 
 	for (; ;) {
 		
-		ls_flag_group_take(&flag_group, LS_FLAG_SET_ALL | LS_FLAG_CONSUME, 0x03, &result, 0);
+		ls_flag_group_take(&flag_group, LS_FLAG_SET_ALL, 0x03, &result, 0);
+		ls_flag_group_get_flag(&flag_group, LS_FLAG_SET_ALL, 0x01, &result_inof);
 		
 		flag1 = 1;
 		ls_delayms(1);
@@ -60,7 +63,9 @@ void task2_func()
 
 		flag2 = 1;
 		ls_delayms(2);
-	  ls_flag_group_give(&flag_group, LS_FLAG_SET, 0x03);
+		ls_flag_group_get_info(&flag_group, &group_info);
+//	  ls_flag_group_give(&flag_group, LS_FLAG_SET, 0x03);
+		ls_flag_group_delete(&flag_group);
 		flag2 = 0;
 		ls_delayms(2);
 	
