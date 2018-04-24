@@ -139,9 +139,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>367</LineNumber>
+          <LineNumber>100</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>3020</Address>
+          <Address>1738</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -150,44 +150,12 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Source\ls_task.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\RTOS\Source/ls_task.c\367</Expression>
+          <Expression>\\RTOS\Source/ls_task.c\100</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>427</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>922</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Source\ls_task.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\RTOS\Source/ls_task.c\427</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
           <LineNumber>384</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\Source\ls_task.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>454</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -407,7 +375,7 @@
         <Wi>
           <IntNumber>0</IntNumber>
           <FirstString>`flag2</FirstString>
-          <SecondString>008000000000000000000000000000000000F03F00000000000000000000000000000000666C6167320000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004100000002000000000000000000D03F1600000000000000000000000000000000000000B8020000</SecondString>
+          <SecondString>008000000000C0FFFFFFDFC10000C0FFFFFFDF4100000000000000000000000000000000666C6167320000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004100000002000000000000000000D03F1600000000000000000000000000000000000000B8020000</SecondString>
         </Wi>
         <Wi>
           <IntNumber>1</IntNumber>
@@ -430,7 +398,7 @@
 
   <Group>
     <GroupName>Source Group 1</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
